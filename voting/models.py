@@ -4,7 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 class VotingEvent(models.Model):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     description = models.TextField(blank=True, verbose_name=_("Description"))
-    expiration_date = models.DateField(verbose_name=_("Expiration Date"))
+    expiration_date = models.DateTimeField(verbose_name=_("Expiration Time"))
 
 class Candidate(models.Model):
     event = models.ForeignKey(VotingEvent, related_name='candidates')
