@@ -2,12 +2,18 @@ from django.db import models
 from datetime import datetime, timedelta
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+import random, string
 
 def default_starting_time():
     return datetime.now()
 
 def default_expire_time():
     return datetime.now() + timedelta(days=30)
+
+PASSPHRASE_LENGTH = 8
+def generate_passphrase():
+    return ''.join([random.choice(string.ascii_uppercase + string.digits)
+                    for i in range(PASSPHRASE_LENGTH)])
 
 class VotingEvent(models.Model):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
@@ -30,12 +36,10 @@ class Candidate(models.Model):
     full_name = models.CharField(max_length=128, verbose_name=_("Full Name"))
 
 class Voter(models.Model):
-    username = models.CharField(max_length=64, verbose_name=_("Username"), unique=True)
+    event = models.ForeignKey(VotingEvent, related_name='voters')
     full_name = models.CharField(max_length=128, verbose_name=_("Full Name"))
-    passphrase = models.CharField(max_length=128, verbose_name=_("Passphrase"))
-
-class Vote(models.Model):
-    event = models.ForeignKey(VotingEvent, related_name='votes')
-    voter = models.ForeignKey(Voter, related_name='votes')
-    choice = models.ForeignKey(Candidate, related_name='votes',
+    username = models.CharField(max_length=64, verbose_name=_("Username"))
+    passphrase = models.CharField(max_length=128, default=generate_passphrase,
+                                  verbose_name=_("Passphrase"))
+    choice = models.ForeignKey(Candidate, related_name='voters',
                                blank=True, null=True, on_delete=models.SET_NULL)

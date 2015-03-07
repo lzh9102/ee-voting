@@ -61,3 +61,15 @@ class VotingEventTests(TestCase):
         response = self.client.post(self.vote1.url_delete, {})
         self.assertRedirects(response, reverse('voting_event_list'))
         self.assertEqual(VotingEvent.objects.filter(pk=self.vote1.pk).count(), 0)
+
+class VoterTests(TestCase):
+
+    def testCreateVoter(self):
+        event = VotingEvent.objects.create(title='vote1',
+                                           starting_date='2015-01-01',
+                                           expiration_date='2015-02-01')
+        voter = Voter.objects.create(event=event,
+                                     full_name='John Smith',
+                                     username='johnsmith')
+        self.assertEqual(voter.username, 'johnsmith')
+        self.assertTrue(len(voter.passphrase) > 0) # auto-generated passphrase
