@@ -13,13 +13,15 @@ class LoginRequiredMixin:
         view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
         return login_required(view)
 
+VOTING_EVENT_FIELDS = ['title', 'description', 'starting_date', 'expiration_date']
+
 class VotingEventList(LoginRequiredMixin, ListView):
     model = VotingEvent
     template_name = 'voting/voting_event_list.html'
 
 class VotingEventCreate(LoginRequiredMixin, CreateView):
     model = VotingEvent
-    fields = ['title', 'description', 'expiration_date']
+    fields = VOTING_EVENT_FIELDS
     template_name = 'voting/voting_event_create.html'
 
     def get_success_url(self):
@@ -27,7 +29,7 @@ class VotingEventCreate(LoginRequiredMixin, CreateView):
 
 class VotingEventEdit(LoginRequiredMixin, UpdateView):
     model = VotingEvent
-    fields = ['title', 'description', 'expiration_date']
+    fields = VOTING_EVENT_FIELDS
     template_name = 'voting/voting_event_edit.html'
     success_url = reverse_lazy('voting_event_list')
 

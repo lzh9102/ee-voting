@@ -24,7 +24,8 @@ class VotingEventTests(TestCase):
         formdata = {
             'title': 'abcd',
             'description': '123',
-            'expiration_date': '2015-01-01 00:00:00',
+            'starting_date': '2015-01-01 00:00:00',
+            'expiration_date': '2015-01-02 00:00:00',
         }
         response = self.client.post(reverse('voting_event_create'), formdata)
         new_vote = VotingEvent.objects.get(title='abcd')
@@ -39,7 +40,8 @@ class VotingEventTests(TestCase):
         formdata = {
             'title': 'vote2',
             'description': 'vote2 - description',
-            'expiration_date': datetime(2015, 12, 23, 1, 2, 3)
+            'starting_date': datetime(2015, 12, 23, 1, 2, 3),
+            'expiration_date': datetime(2015, 12, 23, 2, 2, 3)
         }
         response = self.client.post(self.vote1.url_edit, formdata)
         self.assertRedirects(response, reverse('voting_event_list'))
