@@ -1,0 +1,26 @@
+{% extends 'voting/layout-admin.html' %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <h2 class="page-header">{% block title %}{% trans "Create Voting Event" %}{% endblock %}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+
+    <form method="post">
+      {% csrf_token %}
+      <table>
+        {{ form.as_table }}
+      </table>
+      <input class="btn btn-default" type="submit" value="{% trans "Create"  %}">
+    </form>
+  </div>
+
+</div>
+
+{% endblock content %}

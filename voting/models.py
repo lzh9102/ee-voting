@@ -1,10 +1,19 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
 class VotingEvent(models.Model):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
     description = models.TextField(blank=True, verbose_name=_("Description"))
     expiration_date = models.DateTimeField(verbose_name=_("Expiration Time"))
+
+    @property
+    def url_edit(self):
+        return reverse('voting_event_edit', kwargs={'pk': self.pk})
+
+    @property
+    def url_delete(self):
+        return reverse('voting_event_delete', kwargs={'pk': self.pk})
 
 class Candidate(models.Model):
     event = models.ForeignKey(VotingEvent, related_name='candidates')
