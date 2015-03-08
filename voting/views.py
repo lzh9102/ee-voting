@@ -38,9 +38,19 @@ class VotingEventDelete(LoginRequiredMixin, DeleteView):
     template_name = 'voting/voting_event_delete.html'
     success_url = reverse_lazy('voting_event_list')
 
+# candidate views
+
 CANDIDATE_FIELDS = ['full_name']
 
-class CandidateCreate(LoginRequiredMixin, CreateView):
+class CandidateMixin(LoginRequiredMixin):
+    """ Each candidate is bound to a voting event.
+        This mixin sets the success_url to the VotingEvent page. """
+
+    def get_success_url(self, **kwargs):
+        event = self.object.event
+        return event.url_edit
+
+class CandidateCreate(CandidateMixin, CreateView):
     model = Candidate
     fields = CANDIDATE_FIELDS
     template_name = 'voting/candidate_create.html'
@@ -54,22 +64,11 @@ class CandidateCreate(LoginRequiredMixin, CreateView):
         context['voting_event'] = VotingEvent.objects.get(pk=self.kwargs['event'])
         return context
 
-    def get_success_url(self, **kwargs):
-        event = VotingEvent.objects.get(pk=self.kwargs['event'])
-        return event.url_edit
-
-class CandidateEdit(LoginRequiredMixin, UpdateView):
+class CandidateEdit(CandidateMixin, UpdateView):
     model = Candidate
     fields = CANDIDATE_FIELDS
     template_name = 'voting/candidate_edit.html'
 
-    def get_success_url(self, **kwargs):
-        return self.object.event.url_edit
-
-class CandidateDelete(LoginRequiredMixin, DeleteView):
+class CandidateDelete(CandidateMixin, DeleteView):
     model = Candidate
     template_name = 'voting/candidate_delete.html'
-
-    def get_success_url(self, **kwargs):
-        event = self.object.event
-        return event.url_edit

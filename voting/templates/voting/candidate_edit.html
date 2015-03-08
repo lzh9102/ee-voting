@@ -13,9 +13,13 @@
   <div class="col-lg-12">
     <form method="post">
       {% csrf_token %}
-      {{ form }}
+      <p>
+        <table>
+          {{ form.as_table }}
+        </table>
+      </p>
+      <button class="btn btn-primary" type="submit">{% trans "Save Changes" %}</button>
     </form>
-    <button class="btn btn-primary" type="submit">{% trans "Save Changes" %}</button>
   </div>
 </div>
 
