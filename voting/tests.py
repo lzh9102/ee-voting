@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from .models import *
+from .forms import parse_voters
 
 def login(client):
     credentials = {'username': 'hello', 'password': '1234'}
@@ -147,8 +148,9 @@ class VoterTests(TestCase):
         self.voter2 = Voter.objects.create(event=self.event2,
                                            full_name='Voter2',
                                            username='voter2')
+        login(self.client)
 
-    def testVoteForCandidate(self):
+    def testVoterModelVote(self):
         # should't have a default candidate
         self.assertEqual(self.voter1.choice, None)
 
@@ -167,3 +169,15 @@ class VoterTests(TestCase):
                           self.voter2.vote_for, self.candidate1),
         # voter2's choice is not changed by an error vote
         self.assertEqual(self.voter2.choice, None)
+
+    def testParseVoters(self):
+        result = parse_voters("  The First Voter voter1\nSecond Voter voter2 \n  \n ")
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], ("The First Voter", "voter1"))
+        self.assertEqual(result[1], ("Second Voter", "voter2"))
+
+        # lines with only one token is incorrect
+        self.assertRaises(Exception, parse_voters, "  \tid")
+
+    # TODO: add tests for voter wizard
+

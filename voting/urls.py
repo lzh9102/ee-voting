@@ -15,4 +15,8 @@ urlpatterns = patterns('',
         name='candidate_edit'),
     url(r'^candidate_delete/(?P<pk>\d+)$', CandidateDelete.as_view(),
         name='candidate_delete'),
+
+    # voters
+    url(r'^voting_event/(?P<event>\d+)/add_voter_wizard$', AddVoterWizard.as_view(),
+        name='add_voter_wizard'),
 )
