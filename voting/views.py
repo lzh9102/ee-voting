@@ -123,3 +123,22 @@ class VoterList(VoterMixin, ListView):
         context = super(VoterList, self).get_context_data(**kwargs)
         context['voting_event'] = self.get_voting_event()
         return context
+
+# vote views
+# these views don't require login
+
+class CheckInfoView(FormView):
+    form_class = CheckInfoForm
+    template_name = 'voting/check_info.html'
+
+    def get_initial(self):
+        return {'username': '',
+                'passphrase': ''}
+
+    def form_valid(self, form):
+        voter = form.voter
+        self.request.session['voter_id'] = voter.pk
+        return HttpResponseRedirect(reverse('vote'))
+
+class VoteView(TemplateView):
+    template_name = 'voting/vote.html'

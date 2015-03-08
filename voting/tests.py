@@ -190,3 +190,17 @@ class VoterTests(TestCase):
             self.fail("'voters' should be in context")
         self.assertEqual(len(voters), 1) # event1 has one candidate
 
+class VotingTests(TestCase):
+
+    def setUp(self):
+        login(self.client)
+
+        self.event1 = VotingEvent.objects.create(title='vote1',
+                                                 starting_date='2015-01-01',
+                                                 expiration_date='2015-02-01')
+        self.candidate1 = Candidate.objects.create(event=self.event1,
+                                                   full_name='candidate1')
+        self.candidate2 = Candidate.objects.create(event=self.event2,
+                                                   full_name='candidate2')
+
+    # TODO: test voting views

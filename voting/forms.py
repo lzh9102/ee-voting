@@ -1,5 +1,6 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 from .models import Voter
 import re
 
@@ -65,3 +66,20 @@ class AddVoterConfirmForm(forms.Form):
     def save(self):
         """ This form is just used as confirmation and saves nothing. """
         pass
+
+class CheckInfoForm(forms.ModelForm):
+    class Meta:
+        model = Voter
+        fields = ['username', 'passphrase']
+
+    def clean(self):
+        data = self.cleaned_data
+
+        # find possible users with (username, passphrase)
+        voter = Voter.objects.filter(username=data['username'],
+                                     passphrase=data['passphrase'])
+        if not voter:
+            raise ValidationError(_("The username or passphrase you input is invalid"))
+
+        # TODO: check for multiple voters with the same (username, passphrase)
+        self.voter = voter[0]

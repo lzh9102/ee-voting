@@ -1,0 +1,16 @@
+{% extends 'voting/layout.html' %}
+{% load i18n %}
+
+{% block content %}
+
+<h3>{% block title %}{% trans "Please input your information" %}{% endblock %}</h3>
+
+<form method="post">
+  {% csrf_token %}
+  <table>
+    {{ form.as_table }}
+  </table>
+  <button type="submit">{% trans "Submit" %}</button>
+</form>
+
+{% endblock content %}
