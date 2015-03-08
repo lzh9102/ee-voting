@@ -72,6 +72,16 @@
       </div>
     </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">{% trans "Voters" %}</h3>
+      </div>
+      <div class="panel-body">
+        <p>{% blocktrans with num_voters=object.voters.all.count %}There are {{ num_voters }} voters for this event.{% endblocktrans %}</p>
+        <a class="btn btn-primary" href="{{ object.url_voters }}"">{% trans "View Voter List" %}</a>
+      </div>
+    </div>
+
   </div>
   <!-- end column -->
 
