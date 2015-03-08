@@ -38,17 +38,18 @@ class VotingEventDelete(LoginRequiredMixin, DeleteView):
     template_name = 'voting/voting_event_delete.html'
     success_url = reverse_lazy('voting_event_list')
 
-# candidate views
-
-CANDIDATE_FIELDS = ['full_name']
-
-class CandidateMixin(LoginRequiredMixin):
-    """ Each candidate is bound to a voting event.
-        This mixin sets the success_url to the VotingEvent page. """
+class RedirectToVotingEvent:
 
     def get_success_url(self, **kwargs):
         event = self.object.event
         return event.url_edit
+
+# candidate views
+
+CANDIDATE_FIELDS = ['full_name']
+
+class CandidateMixin(LoginRequiredMixin, RedirectToVotingEvent):
+    pass
 
 class CandidateCreate(CandidateMixin, CreateView):
     model = Candidate
