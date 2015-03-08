@@ -2,6 +2,7 @@ from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from datetime import datetime
 from .models import *
 
@@ -126,3 +127,43 @@ class CandidateTests(TestCase):
         response = self.client.post(self.candidate1.url_delete, {})
         self.assertRedirects(response, self.event.url_edit)
         self.assertFalse(Candidate.objects.filter(pk=self.candidate1.pk).exists())
+
+class VoterTests(TestCase):
+
+    def setUp(self):
+        self.event1 = VotingEvent.objects.create(title='vote1',
+                                                starting_date='2015-01-01',
+                                                expiration_date='2015-02-01')
+        self.candidate1 = Candidate.objects.create(event=self.event1,
+                                                   full_name='candidate1')
+        self.voter1 = Voter.objects.create(event=self.event1,
+                                           full_name='Voter1',
+                                           username='voter1')
+        self.event2 = VotingEvent.objects.create(title='vote2',
+                                                 starting_date='2015-01-01',
+                                                 expiration_date='2015-02-01')
+        self.candidate2 = Candidate.objects.create(event=self.event2,
+                                                   full_name='candidate2')
+        self.voter2 = Voter.objects.create(event=self.event2,
+                                           full_name='Voter2',
+                                           username='voter2')
+
+    def testVoteForCandidate(self):
+        # should't have a default candidate
+        self.assertEqual(self.voter1.choice, None)
+
+        # vote for the candidate
+        try:
+            self.voter1.vote_for(self.candidate1)
+        except:
+            self.fail("voter.vote_for() is broken")
+
+        # verify voter1 has chosen candidate1
+        self.assertEqual(self.voter1.choice, self.candidate1)
+
+        # voter2 belongs to vote2, candidate1 belongs to vote1
+        # voter2 shouldn't be able to vote for candidate1
+        self.assertRaises(ValidationError,
+                          self.voter2.vote_for, self.candidate1),
+        # voter2's choice is not changed by an error vote
+        self.assertEqual(self.voter2.choice, None)

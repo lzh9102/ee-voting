@@ -2,6 +2,7 @@ from django.db import models
 from datetime import datetime, timedelta
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 import random, string
 
 def default_starting_time():
@@ -51,3 +52,9 @@ class Voter(models.Model):
                                   verbose_name=_("Passphrase"))
     choice = models.ForeignKey(Candidate, related_name='voters',
                                blank=True, null=True, on_delete=models.SET_NULL)
+
+    def vote_for(self, candidate):
+        assert(isinstance(candidate, Candidate))
+        if candidate.event != self.event:
+            raise ValidationError("candidate and voter doesn't belong to the same voting event")
+        self.choice = candidate
