@@ -14,7 +14,7 @@
     <form method="post">
       {% csrf_token %}
       <p>
-        {% blocktrans with candidate=object.title %}Are you sure you want to delete candidate <b>{{ candidate }}</b>?{% endblocktrans %}
+        {% blocktrans with candidate=object.full_name %}Are you sure you want to delete candidate <b>{{ candidate }}</b>?{% endblocktrans %}
       </p>
       <input class="btn btn-danger" type="submit" value="{% trans "Yes, delete it!" %}">
       <a class="btn btn-primary" href="{{ object.event.url_edit }}">{% trans "Cancel" %}</a>
