@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView, TemplateView, FormView
+from django.views.generic import ListView, TemplateView, FormView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.utils.translation import ugettext as _
 from django.contrib.formtools.wizard.views import SessionWizardView as MyWizardView
 from .forms import *
 from .models import *
@@ -137,8 +138,53 @@ class CheckInfoView(FormView):
 
     def form_valid(self, form):
         voter = form.voter
+        # FIXME: check for already voted
         self.request.session['voter_id'] = voter.pk
         return HttpResponseRedirect(reverse('vote'))
 
-class VoteView(TemplateView):
+class VoteView(View):
     template_name = 'voting/vote.html'
+    http_method_names = ['get', 'post']
+
+    def get_voter(self):
+        return Voter.objects.get(pk=self.request.session['voter_id'])
+
+    def get(self, request):
+        voter = self.get_voter()
+        if voter.voted:
+            return HttpResponse(_("You already voted!"))
+        return self.display_form(request)
+
+    def display_form(self, request, error=None):
+        voter = self.get_voter()
+        context = {
+            'candidates': voter.event.candidates.all(),
+            'voter': voter,
+            'error': error,
+        }
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        voter = self.get_voter()
+        choice = request.POST.getlist('choice')
+
+        if voter.voted:
+            return HttpResponse(_("You already voted!"))
+
+        if not choice:
+            return self.display_form(request,
+                                     error=_("Please choose one candidate"))
+        elif len(choice) > 1:
+            return self.display_form(request,
+                                     error=_("Can only choose one candidate"))
+
+        # get candidate object
+        candidate = Candidate.objects.get(pk=choice[0])
+        if candidate.event != voter.event:
+            return self.display_form(request,
+                                     error=_("The candidate you chose doesn't belong to this vote!"))
+
+        voter.vote_for(candidate)
+        voter.save()
+
+        return render(request, 'voting/end_message.html')
