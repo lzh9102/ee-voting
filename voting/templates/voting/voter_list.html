@@ -25,12 +25,16 @@
         <table class="table table-striped table-bordered table-hover">
           <thead>
             <th>{% trans "Name" %}</th>
+            <th>{% trans "Username" %}</th>
+            <th>{% trans "Passphrase" %}</th>
             <th>{% trans "Voted" %}</th>
           </thead>
           <tbody>
             {% for voter in voters %}
             <tr>
               <td>{{ voter.full_name }}</td>
+              <td>{{ voter.username }}</td>
+              <td>{{ voter.passphrase }}</td>
               <td>
                 {% if voter.voted %}
                 <i class="fa fa-fw fa-check" title="{% trans "Yes" %}"></i>
