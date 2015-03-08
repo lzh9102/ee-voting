@@ -1,0 +1,24 @@
+{% extends 'voting/layout-admin.html' %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <h2 class="page-header">{% block title %}{% trans "Confirm Candidate Deletion" %}{% endblock %}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <form method="post">
+      {% csrf_token %}
+      <p>
+        {% blocktrans with candidate=object.title %}Are you sure you want to delete candidate <b>{{ candidate }}</b>?{% endblocktrans %}
+      </p>
+      <input class="btn btn-danger" type="submit" value="{% trans "Yes, delete it!" %}">
+      <a class="btn btn-primary" href="{{ object.event.url_edit }}">{% trans "Cancel" %}</a>
+    </form>
+  </div>
+</div>
+{% endblock content %}

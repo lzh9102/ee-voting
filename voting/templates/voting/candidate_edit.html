@@ -1,0 +1,22 @@
+{% extends 'voting/layout-admin.html' %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <h2 class="page-header">{% block title %}{% trans "Edit Candidate" %}{% endblock %}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <form method="post">
+      {% csrf_token %}
+      {{ form }}
+    </form>
+    <button class="btn btn-primary" type="submit">{% trans "Save Changes" %}</button>
+  </div>
+</div>
+
+{% endblock content %}

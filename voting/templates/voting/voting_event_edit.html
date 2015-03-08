@@ -11,6 +11,8 @@
 
 <div class="row">
   <div class="col-lg-12">
+    <h3>{% trans "Settings" %}</h3>
+
     <form method="post">
       {% csrf_token %}
       <div class="form-group">
@@ -20,6 +22,40 @@
       </div>
       <input class="btn btn-default" type="submit" value="{% trans "Save Changes" %}">
     </form>
+
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <h3>{% trans "Candidates" %}</h3>
+    <a class="btn btn-primary" href="{% url 'candidate_create' object.pk %}">
+      <i class="fa fa-fw fa-plus"></i>
+      {% trans "Add new candidate" %}
+    </a>
+    <p>
+      <table class="table table-striped table-bordered table-hover">
+        <thead>
+          <th>{% trans "Full Name" %}</th>
+          <th>{% trans "Actions" %}</th>
+        </thead>
+        <tbody>
+          {% for candidate in object.candidates.all %}
+          <tr>
+            <td>{{ candidate.full_name }}</td>
+            <td>
+              <a href="{{ candidate.url_edit }}">
+                <i class="fa fa-fw fa-pencil"></i> {% trans "Edit" %}
+              </a>
+              <a href="{{ candidate.url_delete }}">
+                <i class="fa fa-fw fa-pencil"></i> {% trans "Delete" %}
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </p>
   </div>
 </div>
 

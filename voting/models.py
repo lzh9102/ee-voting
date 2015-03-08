@@ -35,6 +35,14 @@ class Candidate(models.Model):
     event = models.ForeignKey(VotingEvent, related_name='candidates')
     full_name = models.CharField(max_length=128, verbose_name=_("Full Name"))
 
+    @property
+    def url_edit(self):
+        return reverse('candidate_edit', kwargs={'pk': self.pk})
+
+    @property
+    def url_delete(self):
+        return reverse('candidate_delete', kwargs={'pk': self.pk})
+
 class Voter(models.Model):
     event = models.ForeignKey(VotingEvent, related_name='voters')
     full_name = models.CharField(max_length=128, verbose_name=_("Full Name"))
