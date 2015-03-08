@@ -58,3 +58,7 @@ class Voter(models.Model):
         if candidate.event != self.event:
             raise ValidationError("candidate and voter doesn't belong to the same voting event")
         self.choice = candidate
+
+    @property
+    def voted(self):
+        return self.choice != None

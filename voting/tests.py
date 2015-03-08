@@ -181,3 +181,12 @@ class VoterTests(TestCase):
 
     # TODO: add tests for voter wizard
 
+    def testListVoters(self):
+        response = self.client.get(reverse('voter_list',
+                                           kwargs={'event': self.event1.pk}))
+        try:
+            voters = response.context['voters']
+        except:
+            self.fail("'voters' should be in context")
+        self.assertEqual(len(voters), 1) # event1 has one candidate
+

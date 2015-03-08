@@ -81,16 +81,14 @@ class CandidateDelete(CandidateMixin, DeleteView):
 # voter-adding interface is implemented as a custom form that enables the
 # administrator to add multiple voters quickly.
 
-# VoterMixin = LoginRequiredMixin + RedirectToVotingEvent
-class VoterMixin(LoginRequiredMixin, RedirectToVotingEvent):
-    pass
-
-class AddVoterWizard(LoginRequiredMixin, MyWizardView):
-    template_name = 'voting/add_voter_wizard.html'
-    form_list = [AddVoterForm, AddVoterConfirmForm]
+class VoterMixin(LoginRequiredMixin):
 
     def get_voting_event(self):
         return VotingEvent.objects.get(pk=self.kwargs['event'])
+
+class AddVoterWizard(VoterMixin, MyWizardView):
+    template_name = 'voting/add_voter_wizard.html'
+    form_list = [AddVoterForm, AddVoterConfirmForm]
 
     def get_success_url(self, **kwargs):
         return self.get_voting_event().url_edit
@@ -112,3 +110,16 @@ class AddVoterWizard(LoginRequiredMixin, MyWizardView):
         event = self.get_voting_event()
         voter_form.save(voting_event=event)
         return HttpResponseRedirect(self.get_success_url())
+
+class VoterList(VoterMixin, ListView):
+    template_name = 'voting/voter_list.html'
+    context_object_name = 'voters'
+
+    def get_queryset(self):
+        self.event = self.get_voting_event()
+        return Voter.objects.filter(event=self.event)
+
+    def get_context_data(self, **kwargs):
+        context = super(VoterList, self).get_context_data(**kwargs)
+        context['voting_event'] = self.get_voting_event()
+        return context
