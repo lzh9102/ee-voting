@@ -100,18 +100,16 @@ class VotingEventTests(TestCase):
         self.assertIn('not_voted_voters', response.context)
         self.assertEqual(list(response.context['not_voted_voters']), [voter4])
 
-# TODO: enable this after implementing CRUD for Voter
-#class VoterTests(TestCase):
-#
-#    def testCreateVoter(self):
-#        event = VotingEvent.objects.create(title='vote1',
-#                                           starting_date='2015-01-01',
-#                                           expiration_date='2015-02-01')
-#        voter = Voter.objects.create(event=event,
-#                                     full_name='John Smith',
-#                                     username='johnsmith')
-#        self.assertEqual(voter.username, 'johnsmith')
-#        self.assertTrue(len(voter.passphrase) > 0) # auto-generated passphrase
+class VoterTests(TestCase):
+
+    def testGeneratePassphrase(self):
+        event = VotingEvent.objects.create(title='vote1',
+                                           starting_date='2015-01-01',
+                                           expiration_date='2015-02-01')
+        voter = Voter.objects.create(event=event,
+                                     full_name='John Smith',
+                                     username='johnsmith')
+        self.assertTrue(len(voter.passphrase) > 0) # auto-generated passphrase
 
 class CandidateTests(TestCase):
 
