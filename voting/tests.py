@@ -215,6 +215,7 @@ class VotingTests(TestCase):
         # the welcome page doesn't require login
         response = client.get(reverse('welcome_page'))
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('voting/welcome_page.html')
         self.assertEqual(len(response.context['form'].errors), 0)
 
         # input a correct candidate and an incorrect passphrase

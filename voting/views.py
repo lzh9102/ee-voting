@@ -128,15 +128,15 @@ class VoterList(VoterMixin, ListView):
 # vote views
 # these views don't require login
 
-class CheckInfoView(FormView):
+class WelcomePage(FormView):
     form_class = CheckInfoForm
-    template_name = 'voting/check_info.html'
+    template_name = 'voting/welcome_page.html'
 
     def dispatch(self, request, *args, **kwargs):
         # redirect to voting page if session['voter_id'] is already set
         if 'voter_id' in self.request.session:
             return HttpResponseRedirect(reverse('vote'))
-        return super(CheckInfoView, self).dispatch(request, *args, **kwargs)
+        return super(WelcomePage, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         return {'username': '',
