@@ -132,6 +132,12 @@ class CheckInfoView(FormView):
     form_class = CheckInfoForm
     template_name = 'voting/check_info.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        # redirect to voting page if session['voter_id'] is already set
+        if 'voter_id' in self.request.session:
+            return HttpResponseRedirect(reverse('vote'))
+        return super(CheckInfoView, self).dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         return {'username': '',
                 'passphrase': ''}
@@ -146,6 +152,12 @@ class VoteView(View):
     template_name = 'voting/vote.html'
     http_method_names = ['get', 'post']
 
+    def dispatch(self, request, *args, **kwargs):
+        # redirect to welcome_page if no voter information in session
+        if 'voter_id' not in request.session:
+            return HttpResponseRedirect(reverse('welcome_page'))
+        return super(VoteView, self).dispatch(request, *args, **kwargs)
+
     def get_voter(self):
         return Voter.objects.get(pk=self.request.session['voter_id'])
 
@@ -159,6 +171,7 @@ class VoteView(View):
         voter = self.get_voter()
         context = {
             'candidates': voter.event.candidates.all(),
+            'event': voter.event,
             'voter': voter,
             'error': error,
         }
@@ -184,7 +197,11 @@ class VoteView(View):
             return self.display_form(request,
                                      error=_("The candidate you chose doesn't belong to this vote!"))
 
+        # vote
         voter.vote_for(candidate)
         voter.save()
+
+        # clear voter information from session data
+        request.session.pop('voter_id', None)
 
         return render(request, 'voting/end_message.html')

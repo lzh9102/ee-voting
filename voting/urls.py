@@ -23,6 +23,6 @@ urlpatterns = patterns('',
         name='voter_list'),
 
     # voting
-    url(r'^$', CheckInfoView.as_view(), name='check_info'),
+    url(r'^$', CheckInfoView.as_view(), name='welcome_page'),
     url(r'^vote$', VoteView.as_view(), name='vote'),
 )
