@@ -298,3 +298,24 @@ class VotingTests(TestCase):
             self.assertEqual(response.status_code, 200)
         except:
             self.fail("welcome_page: empty username/password causes an error")
+
+    def testCancelVote(self):
+        client = Client()
+
+        # Input a correct voter/passphrase pair.
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase,
+        }, follow=True)
+
+        # cancel should redirect and stop at welcome_page
+        response = client.post(reverse('vote'), {
+            'choice': [self.candidate2.pk],
+            'cancel': None,
+        }, follow=True)
+        self.assertRedirects(response, reverse('welcome_page'))
+
+        # the database shouldn't have changed
+        voter1 = Voter.objects.get(pk=self.voter1.pk)
+        self.assertEqual(voter1.choice, None)
+

@@ -192,9 +192,16 @@ class VoteView(View):
         }
         return render(request, self.template_name, context)
 
+    def clear_session(self):
+        self.request.session.pop('voter_id', None)
+
     def post(self, request):
         voter = self.get_voter()
         choice = request.POST.getlist('choice')
+
+        if 'cancel' in request.POST: # user cancels, return to welcome page
+            self.clear_session()
+            return HttpResponseRedirect(reverse('welcome_page'))
 
         if voter.voted:
             return HttpResponse(_("You already voted!"))
@@ -216,7 +223,6 @@ class VoteView(View):
         voter.vote_for(candidate)
         voter.save()
 
-        # clear voter information from session data
-        request.session.pop('voter_id', None)
+        self.clear_session()
 
         return render(request, 'voting/end_message.html')
