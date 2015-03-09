@@ -156,7 +156,7 @@ class WelcomePage(FormView):
 
         # validation error, display the form again
         context = {
-            'form': self.form_class(),
+            'form': self.form_class(initial={'username': '', 'passphrase': ''}),
             'error': _("The username or passphrase you input is invalid"),
         }
         return render(self.request, self.template_name, context)
