@@ -67,6 +67,39 @@ class VotingEventTests(TestCase):
         self.assertRedirects(response, reverse('voting_event_list'))
         self.assertEqual(VotingEvent.objects.filter(pk=self.vote1.pk).count(), 0)
 
+    def testStatus(self):
+        vote = VotingEvent.objects.create(title='vote1',
+                                          expiration_date='2015-01-01 00:00:00')
+        candidate1 = Candidate.objects.create(event=vote,
+                                              full_name='Candidate1')
+        candidate2 = Candidate.objects.create(event=vote,
+                                              full_name='Candidate2')
+        voter1 = Voter.objects.create(event=vote,
+                                      full_name='voter1',
+                                      username='voter1',
+                                      choice=candidate1)
+        voter2 = Voter.objects.create(event=vote,
+                                      full_name='voter2',
+                                      username='voter2',
+                                      choice=candidate2)
+        voter3 = Voter.objects.create(event=vote,
+                                      full_name='voter3',
+                                      username='voter3',
+                                      choice=candidate2)
+        voter4 = Voter.objects.create(event=vote,
+                                      full_name='voter4',
+                                      username='voter4') # not voted
+
+        response = self.client.get(reverse('voting_event_status',
+                                           kwargs={'pk': vote.pk}))
+        self.assertIn('candidates', response.context)
+        candidates = response.context['candidates']
+        # candidate2 get more votes than candidate1
+        self.assertEqual(candidates, [candidate2, candidate1])
+
+        self.assertIn('not_voted_voters', response.context)
+        self.assertEqual(list(response.context['not_voted_voters']), [voter4])
+
 # TODO: enable this after implementing CRUD for Voter
 #class VoterTests(TestCase):
 #
@@ -90,6 +123,14 @@ class CandidateTests(TestCase):
                                                    full_name='candidate1')
         self.candidate2 = Candidate.objects.create(event=self.event,
                                                    full_name='candidate2')
+        self.voter1 = Voter.objects.create(event=self.event,
+                                           full_name='voter1',
+                                           username='voter1',
+                                           choice=self.candidate1)
+        self.voter2 = Voter.objects.create(event=self.event,
+                                           full_name='voter2',
+                                           username='voter2',
+                                           choice=self.candidate2)
         login(self.client)
 
     def testCandidateCreate(self):
@@ -128,6 +169,10 @@ class CandidateTests(TestCase):
         response = self.client.post(self.candidate1.url_delete, {})
         self.assertRedirects(response, self.event.url_edit)
         self.assertFalse(Candidate.objects.filter(pk=self.candidate1.pk).exists())
+
+    def testModelGetVoters(self):
+        self.assertEqual(self.candidate1.voters.all().count(), 1)
+        self.assertEqual(self.candidate1.voters.all()[0], self.voter1)
 
 class VoterTests(TestCase):
 

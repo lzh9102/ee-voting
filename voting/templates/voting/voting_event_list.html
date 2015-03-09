@@ -30,7 +30,11 @@
       <tbody>
         {% for voting_event in object_list %}
         <tr>
-          <td>{{ voting_event.title }}</td>
+          <td>
+            <a href="{% url 'voting_event_status' voting_event.pk %}">
+              {{ voting_event.title }}
+            </a>
+          </td>
           <td>{{ voting_event.expiration_date }}</td>
           <td>
             <a href="{{ voting_event.url_edit }}">

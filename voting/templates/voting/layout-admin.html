@@ -19,6 +19,7 @@ bootstrap theme.
     <link href="{% static 'voting/css/metisMenu.min.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'voting/css/sb-admin-2.css' %}" rel="stylesheet" type="text/css">
     <link href="{% static 'voting/css/font-awesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'voting/css/morris.css' %}" rel="stylesheet" type="text/css">
 
   </head>
   <body>
@@ -83,5 +84,9 @@ bootstrap theme.
     <script src="{% static 'voting/js/bootstrap.min.js' %}"></script>
     <script src="{% static 'voting/js/metisMenu.min.js' %}"></script>
     <script src="{% static 'voting/js/sb-admin-2.js' %}"></script>
+    <script src="{% static 'voting/js/morris.min.js' %}"></script>
+    <script src="{% static 'voting/js/raphael-min.js' %}"></script>
+    {% block scripts %}
+    {% endblock %}
   </body>
 </html>

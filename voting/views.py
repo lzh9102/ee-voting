@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.generic import ListView, TemplateView, FormView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.detail import DetailView
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.contrib.formtools.wizard.views import SessionWizardView as MyWizardView
@@ -39,6 +40,25 @@ class VotingEventDelete(LoginRequiredMixin, DeleteView):
     model = VotingEvent
     template_name = 'voting/voting_event_delete.html'
     success_url = reverse_lazy('voting_event_list')
+
+class VotingEventStatus(LoginRequiredMixin, DetailView):
+    template_name = 'voting/voting_event_status.html'
+    model = VotingEvent
+    context_object_name = 'voting_event'
+
+    def get_context_data(self, **kwargs):
+        context = super(VotingEventStatus, self).get_context_data(**kwargs)
+
+        # sort candidates by number of obtained votes (descending)
+        candidates = list(self.object.candidates.all())
+        candidates.sort(key=lambda candidate: -candidate.voters.all().count())
+
+        # voters who have not voted
+        not_voted_voters = self.object.voters.filter(choice=None)
+
+        context['candidates'] = candidates
+        context['not_voted_voters'] = not_voted_voters
+        return context
 
 class RedirectToVotingEvent:
 
