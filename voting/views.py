@@ -143,10 +143,25 @@ class WelcomePage(FormView):
                 'passphrase': ''}
 
     def form_valid(self, form):
-        voter = form.voter
-        # FIXME: check for already voted
-        self.request.session['voter_id'] = voter.pk
-        return HttpResponseRedirect(reverse('vote'))
+        data = form.cleaned_data
+
+        # find possible users with (username, passphrase)
+        voters = Voter.objects.filter(username=data['username'],
+                                      passphrase=data['passphrase'])
+        if voters:
+            # TODO: check for multiple voters with the same (username, passphrase)
+            voter = voters[0]
+            self.request.session['voter_id'] = voter.pk
+            return HttpResponseRedirect(reverse('vote'))
+
+        # validation error, display the form again
+        context = {
+            'form': self.form_class(),
+            'error': _("The username or passphrase you input is invalid"),
+        }
+        return render(self.request, self.template_name, context)
+
+
 
 class VoteView(View):
     template_name = 'voting/vote.html'

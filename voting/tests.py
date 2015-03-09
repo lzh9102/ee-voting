@@ -216,7 +216,7 @@ class VotingTests(TestCase):
         response = client.get(reverse('welcome_page'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed('voting/welcome_page.html')
-        self.assertEqual(len(response.context['form'].errors), 0)
+        self.assertNotIn('error', response.context)
 
         # input a correct candidate and an incorrect passphrase
         response = client.post(reverse('welcome_page'), {
@@ -225,7 +225,7 @@ class VotingTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.context)
-        self.assertNotEqual(len(response.context['form'].errors), 0)
+        self.assertIn('error', response.context)
 
         # input a correct passphrase and an incorrect voter
         response = client.post(reverse('welcome_page'), {
@@ -234,7 +234,7 @@ class VotingTests(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.context)
-        self.assertNotEqual(len(response.context['form'].errors), 0)
+        self.assertIn('error', response.context)
 
     def testVotingProcess(self):
         client = Client()
