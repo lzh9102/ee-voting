@@ -12,6 +12,10 @@
       <i class="fa fa-fw fa-arrow-left"></i>
       {% blocktrans with event=voting_event.title %}Back to {{ event }}{% endblocktrans %}
     </a>
+		<a href="{% url 'add_voter_wizard' voting_event.pk %}">
+			<i class="fa fa-fw fa-plus"></i>
+			{% trans "Add Voters" %}
+		</a>
   </div>
 </div>
 

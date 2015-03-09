@@ -78,7 +78,17 @@
       </div>
       <div class="panel-body">
         <p>{% blocktrans with num_voters=object.voters.all.count %}There are {{ num_voters }} voters for this event.{% endblocktrans %}</p>
-        <a class="btn btn-primary" href="{{ object.url_voters }}"">{% trans "View Voter List" %}</a>
+
+        <a class="btn btn-primary" href="{% url 'add_voter_wizard' object.pk %}">
+          <i class="fa fa-fw fa-plus"></i>
+          {% trans "Add Voters" %}
+        </a>
+
+        <a class="btn btn-primary" href="{{ object.url_voters }}">
+          <i class="fa fa-fw fa-list"></i>
+          {% trans "View Voter List" %}
+        </a>
+
       </div>
     </div>
 
