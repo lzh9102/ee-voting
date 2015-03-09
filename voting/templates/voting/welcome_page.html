@@ -1,0 +1,26 @@
+{% extends 'voting/layout.html' %}
+{% load i18n %}
+
+{% block content %}
+
+<div class="row">
+  <div class="col-lg-12">
+    <h2>{% block title %}{{ event.title }}{% endblock %}</h2>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-12">
+    <form method="post">
+      {% csrf_token %}
+      <p>
+        <table>
+          {{ form.as_table }}
+        </table>
+      </p>
+      <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
+    </form>
+  </div>
+</div>
+
+{% endblock content %}

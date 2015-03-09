@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.views.generic import ListView, TemplateView, FormView
+from django.views.generic import ListView, TemplateView, FormView, View
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic.detail import DetailView
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.utils.translation import ugettext as _
 from django.contrib.formtools.wizard.views import SessionWizardView as MyWizardView
 from .forms import *
 from .models import *
@@ -147,18 +148,101 @@ class VoterList(VoterMixin, ListView):
 # vote views
 # these views don't require login
 
-class CheckInfoView(FormView):
+class WelcomePage(FormView):
     form_class = CheckInfoForm
-    template_name = 'voting/check_info.html'
+    template_name = 'voting/welcome_page.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        # redirect to voting page if session['voter_id'] is already set
+        if 'voter_id' in self.request.session:
+            return HttpResponseRedirect(reverse('vote'))
+        return super(WelcomePage, self).dispatch(request, *args, **kwargs)
 
     def get_initial(self):
         return {'username': '',
                 'passphrase': ''}
 
     def form_valid(self, form):
-        voter = form.voter
-        self.request.session['voter_id'] = voter.pk
-        return HttpResponseRedirect(reverse('vote'))
+        data = form.cleaned_data
 
-class VoteView(TemplateView):
+        # find possible users with (username, passphrase)
+        voters = Voter.objects.filter(username=data['username'],
+                                      passphrase=data['passphrase'])
+        if voters:
+            # TODO: check for multiple voters with the same (username, passphrase)
+            voter = voters[0]
+            self.request.session['voter_id'] = voter.pk
+            return HttpResponseRedirect(reverse('vote'))
+
+        # validation error, display the form again
+        context = {
+            'form': self.form_class(initial={'username': '', 'passphrase': ''}),
+            'error': _("The username or passphrase you input is invalid"),
+        }
+        return render(self.request, self.template_name, context)
+
+
+
+class VoteView(View):
     template_name = 'voting/vote.html'
+    http_method_names = ['get', 'post']
+
+    def dispatch(self, request, *args, **kwargs):
+        # redirect to welcome_page if no voter information in session
+        if 'voter_id' not in request.session:
+            return HttpResponseRedirect(reverse('welcome_page'))
+        return super(VoteView, self).dispatch(request, *args, **kwargs)
+
+    def get_voter(self):
+        return Voter.objects.get(pk=self.request.session['voter_id'])
+
+    def get(self, request):
+        voter = self.get_voter()
+        if voter.voted:
+            return HttpResponse(_("You already voted!"))
+        return self.display_form(request)
+
+    def display_form(self, request, error=None):
+        voter = self.get_voter()
+        context = {
+            'candidates': voter.event.candidates.all(),
+            'event': voter.event,
+            'voter': voter,
+            'error': error,
+        }
+        return render(request, self.template_name, context)
+
+    def clear_session(self):
+        self.request.session.pop('voter_id', None)
+
+    def post(self, request):
+        voter = self.get_voter()
+        choice = request.POST.getlist('choice')
+
+        if 'cancel' in request.POST: # user cancels, return to welcome page
+            self.clear_session()
+            return HttpResponseRedirect(reverse('welcome_page'))
+
+        if voter.voted:
+            return HttpResponse(_("You already voted!"))
+
+        if not choice:
+            return self.display_form(request,
+                                     error=_("Please choose one candidate"))
+        elif len(choice) > 1:
+            return self.display_form(request,
+                                     error=_("Can only choose one candidate"))
+
+        # get candidate object
+        candidate = Candidate.objects.get(pk=choice[0])
+        if candidate.event != voter.event:
+            return self.display_form(request,
+                                     error=_("The candidate you chose doesn't belong to this vote!"))
+
+        # vote
+        voter.vote_for(candidate)
+        voter.save()
+
+        self.clear_session()
+
+        return render(request, 'voting/end_message.html')

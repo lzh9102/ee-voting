@@ -3,13 +3,41 @@
 
 {% block content %}
 
-<h3>{% block title %}{% trans "Please vote for a candidate" %}{% endblock %}</h3>
+<div class="row">
+  <div class="col-lg-12">
+    <h2>{% block title %}{{ event.title }}{% endblock %}</h3>
+  </div>
+</div>
 
-<form method="post">
-  {% csrf_token %}
-  <table>
-  </table>
-  <button type="submit">{% trans "Submit" %}</button>
-</form>
+<div class="row">
+  <div class="col-lg-12">
+
+    {% if error %}
+    <div class="alert alert-info">
+      <i class="fa fa-fw fa-info-circle"></i>
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="container">
+        <p>
+          {% blocktrans with name=voter.full_name %}Hello, {{name}}! Please vote for a candidate{% endblocktrans %}
+        </p>
+        {% for candidate in candidates %}
+        <div class="radio">
+          <label>
+            <input type="radio" name="choice" value="{{ candidate.pk }}">
+            {{ candidate.full_name }}
+          </label>
+        </div>
+      {% endfor %}
+      </div>
+      <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
+      <button name="cancel" class="btn btn-default" type="submit">{% trans "Cancel" %}</button>
+    </form>
+  </div>
+</div>
 
 {% endblock %}

@@ -243,7 +243,122 @@ class VotingTests(TestCase):
                                                  expiration_date='2015-02-01')
         self.candidate1 = Candidate.objects.create(event=self.event1,
                                                    full_name='candidate1')
-        self.candidate2 = Candidate.objects.create(event=self.event2,
+        self.candidate2 = Candidate.objects.create(event=self.event1,
                                                    full_name='candidate2')
+        self.voter1 = Voter.objects.create(event=self.event1,
+                                           username='voter1')
+        self.voter2 = Voter.objects.create(event=self.event1,
+                                           username='voter2')
+        self.voter3 = Voter.objects.create(event=self.event1,
+                                           username='voter3')
 
-    # TODO: test voting views
+    def testWelcomePageReject(self):
+        client = Client()
+
+        # the welcome page doesn't require login
+        response = client.get(reverse('welcome_page'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed('voting/welcome_page.html')
+        self.assertNotIn('error', response.context)
+
+        # input a correct candidate and an incorrect passphrase
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase + '123',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('form', response.context)
+        self.assertIn('error', response.context)
+
+        # input a correct passphrase and an incorrect voter
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username + '123',
+            'passphrase': self.voter1.passphrase,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('form', response.context)
+        self.assertIn('error', response.context)
+
+    def testVotingProcess(self):
+        client = Client()
+
+        # Input a correct voter/passphrase pair.
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase,
+        }, follow=True)
+
+        # Following the response, it should redirect to the voting page.
+        self.assertRedirects(response, reverse('vote'))
+        self.assertEqual(response.context['event'], self.event1)
+        self.assertEqual(response.context['voter'], self.voter1)
+
+        # Now the browser should be on the voting page.
+        # If we now point the browser to the welcome_page again, it should
+        # redirect to the same voting page.
+        response = client.get(reverse('welcome_page'), follow=True)
+        self.assertRedirects(response, reverse('vote'))
+        self.assertEqual(response.context['voter'], self.voter1)
+
+        # Submit without choosing a candidate. This should show the form again
+        # with error messages
+        response = client.post(reverse('vote'), {})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'voting/vote.html')
+
+        # Just in case, if the client submits multiple clients, it should also
+        # be an error
+        response = client.post(reverse('vote'), {
+            'choice': [self.candidate1.pk, self.candidate2.pk]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'voting/vote.html')
+
+        # Vote for exactly one candidate (candidate2) should show the final message.
+        response = client.post(reverse('vote'), {
+            'choice': [self.candidate2.pk]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'voting/end_message.html')
+
+        # voter1.choice should be updated in the database
+        voter1 = Voter.objects.get(pk=self.voter1.pk)
+        self.assertEqual(voter1.choice, self.candidate2)
+
+        # After that, the welcome page should not redirect anymore
+        response = client.get(reverse('welcome_page'))
+        self.assertEqual(response.status_code, 200)
+
+        # The vote page should redirect back to the welcome page
+        response = client.get(reverse('vote'))
+        self.assertRedirects(response, reverse('welcome_page'))
+
+    def testEmptyUsernameError(self):
+        """ Submitting an empty username/password should throw an exception """
+        client = Client()
+        try:
+            response = client.post(reverse('welcome_page'), {})
+            self.assertEqual(response.status_code, 200)
+        except:
+            self.fail("welcome_page: empty username/password causes an error")
+
+    def testCancelVote(self):
+        client = Client()
+
+        # Input a correct voter/passphrase pair.
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase,
+        }, follow=True)
+
+        # cancel should redirect and stop at welcome_page
+        response = client.post(reverse('vote'), {
+            'choice': [self.candidate2.pk],
+            'cancel': None,
+        }, follow=True)
+        self.assertRedirects(response, reverse('welcome_page'))
+
+        # the database shouldn't have changed
+        voter1 = Voter.objects.get(pk=self.voter1.pk)
+        self.assertEqual(voter1.choice, None)
+
