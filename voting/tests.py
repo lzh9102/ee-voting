@@ -289,3 +289,12 @@ class VotingTests(TestCase):
         # The vote page should redirect back to the welcome page
         response = client.get(reverse('vote'))
         self.assertRedirects(response, reverse('welcome_page'))
+
+    def testEmptyUsernameError(self):
+        """ Submitting an empty username/password should throw an exception """
+        client = Client()
+        try:
+            response = client.post(reverse('welcome_page'), {})
+            self.assertEqual(response.status_code, 200)
+        except:
+            self.fail("welcome_page: empty username/password causes an error")

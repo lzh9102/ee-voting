@@ -75,11 +75,12 @@ class CheckInfoForm(forms.ModelForm):
     def clean(self):
         data = self.cleaned_data
 
-        # find possible users with (username, passphrase)
-        voter = Voter.objects.filter(username=data['username'],
-                                     passphrase=data['passphrase'])
-        if not voter:
-            raise ValidationError(_("The username or passphrase you input is invalid"))
+        if ('username' in data) and ('passphrase' in data):
+            # find possible users with (username, passphrase)
+            voter = Voter.objects.filter(username=data['username'],
+                                        passphrase=data['passphrase'])
+            if not voter:
+                raise ValidationError(_("The username or passphrase you input is invalid"))
 
-        # TODO: check for multiple voters with the same (username, passphrase)
-        self.voter = voter[0]
+            # TODO: check for multiple voters with the same (username, passphrase)
+            self.voter = voter[0]
