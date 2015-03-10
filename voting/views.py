@@ -198,8 +198,6 @@ class VoteView(View):
 
     def get(self, request):
         voter = self.get_voter()
-        if voter.voted:
-            return HttpResponse(_("You already voted!"))
         return self.display_form(request)
 
     def display_form(self, request, error=None):
@@ -222,9 +220,6 @@ class VoteView(View):
         if 'cancel' in request.POST: # user cancels, return to welcome page
             self.clear_session()
             return HttpResponseRedirect(reverse('welcome_page'))
-
-        if voter.voted:
-            return HttpResponse(_("You already voted!"))
 
         if not choice:
             return self.display_form(request,

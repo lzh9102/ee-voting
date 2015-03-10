@@ -279,8 +279,22 @@ class VotingTests(TestCase):
         self.assertIn('form', response.context)
         self.assertIn('error', response.context)
 
-    def testVotingProcess(self):
+    def testVotingProgess(self):
         client = Client()
+
+        # The voter is allowed to change his/her decision for an indefinite
+        # number of times. We'll test the situation that voter1 votes for
+        # candidate1 at first, but later he changes his mind and want to vote
+        # for candidate2.
+
+        # voter1 votes for candidate1
+        self.runVotingProcess(client, self.candidate1)
+
+        # voter1 changes his mind and votes for candidate2
+        self.runVotingProcess(client, self.candidate2)
+
+    def runVotingProcess(self, client, chosen_candidate):
+        """ Run the voting process and make assertions """
 
         # Input a correct voter/passphrase pair.
         response = client.post(reverse('welcome_page'), {
@@ -314,16 +328,16 @@ class VotingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/vote.html')
 
-        # Vote for exactly one candidate (candidate2) should show the final message.
+        # Vote for exactly one candidate should show the final message.
         response = client.post(reverse('vote'), {
-            'choice': [self.candidate2.pk]
+            'choice': [chosen_candidate.pk]
         })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/end_message.html')
 
         # voter1.choice should be updated in the database
         voter1 = Voter.objects.get(pk=self.voter1.pk)
-        self.assertEqual(voter1.choice, self.candidate2)
+        self.assertEqual(voter1.choice, chosen_candidate)
 
         # After that, the welcome page should not redirect anymore
         response = client.get(reverse('welcome_page'))
