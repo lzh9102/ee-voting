@@ -25,6 +25,7 @@
       <table class="table table-striped table-bordered table-hover">
         <thead>
           <th>{% trans "Name" %}</th>
+          {# Translators: Noun. Number of votes. #}
           <th>{% trans "Votes" %}</th>
         </thead>
         <tbody>
@@ -52,6 +53,7 @@
     {% for candidate in candidates %}
       {label: "{{ candidate }}", value: {{ candidate.voters.all.count }}},
     {% endfor %}
+      {# Translators: Number of voters who didn't vote for any candidate #}
       {label: "{% trans "Not Voted" %}", value: {{ not_voted_voters.count }}}
     ]
   });

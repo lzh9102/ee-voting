@@ -26,7 +26,8 @@ def parse_voters(text):
         # extract (name, id)
         match = re.match(r'^(?P<name>.+)\s+(?P<id>[a-zA-Z0-9_\-]+)$', line)
         if not match:
-            raise Exception(_("Incorrect format on line %d: %s") % (lineno, line))
+            raise Exception(_("Incorrect format on line %(line)d: %(content)s")
+                            % {'line': lineno, 'content': line})
         name = match.group('name').strip()
         id = match.group('id')
         voters.append((name, id))
