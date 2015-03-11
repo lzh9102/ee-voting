@@ -18,6 +18,14 @@
         <p>
           {{ form|crispy }}
         </p>
+
+        {% if error %}
+        <div class="alert alert-danger">
+          <i class="fa fa-fw fa-exclamation-triangle"></i>
+          {{ error }}
+        </div>
+        {% endif %}
+
         <button class="btn btn-primary pull-right" type="submit">
           {% trans "Continue" %}
           <i class="fa fa-angle-double-right"></i>
