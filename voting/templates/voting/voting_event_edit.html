@@ -1,5 +1,6 @@
 {% extends 'voting/layout-admin.html' %}
 {% load i18n %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -21,11 +22,7 @@
       <div class="panel-body">
         <form method="post">
           {% csrf_token %}
-          <div class="form-group">
-            <table>
-              {{ form.as_table }}
-            </table>
-          </div>
+          {{ form|crispy }}
           <input class="btn btn-primary" type="submit" value="{% trans "Save Changes" %}">
         </form>
       </div>

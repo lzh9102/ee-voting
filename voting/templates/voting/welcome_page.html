@@ -1,5 +1,6 @@
 {% extends 'voting/layout.html' %}
 {% load i18n %}
+{% load crispy_forms_tags %}
 
 {% block content %}
 
@@ -12,12 +13,10 @@
         {% blocktrans %} Welcome to NCTU EE voting system. Please input your username and passphrase to continue.{% endblocktrans %}
       </p>
 
-      <form method="post">
+      <form id="welcome-page-signin" method="post">
         {% csrf_token %}
         <p>
-          <table>
-            {{ form.as_table }}
-          </table>
+          {{ form|crispy }}
         </p>
         <button class="btn btn-primary pull-right" type="submit">
           {% trans "Continue" %}
