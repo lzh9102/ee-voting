@@ -44,10 +44,15 @@ bootstrap theme.
           <!-- /.dropdown -->
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-              <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+              <i class="fa fa-fw fa-user"></i>
+              {{ user.username }}
+              <i class="fa fa-caret-down"></i>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+              <li>
+                <a href="/admin/logout?next=/">
+                  <i class="fa fa-sign-out fa-fw"></i> {% trans "Logout" %}
+                </a>
               </li>
             </ul>
             <!-- /.dropdown-user -->
