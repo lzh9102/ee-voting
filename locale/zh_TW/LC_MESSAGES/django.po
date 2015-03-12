@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-11 23:11+0800\n"
-"PO-Revision-Date: 2015-03-11 23:08+0800\n"
+"POT-Creation-Date: 2015-03-12 14:02+0800\n"
+"PO-Revision-Date: 2015-03-12 14:02+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -260,11 +260,11 @@ msgstr "尚未投票"
 msgid "Welcome to NCTU EE Voting"
 msgstr "歡迎來到交大電子投票系統"
 
-#: voting/templates/voting/welcome_page.html:13
-msgid "Please input your username and passphrase to continue."
-msgstr "請輸入您的使用者名稱及密碼以繼續。"
+#: voting/templates/voting/welcome_page.html:19
+msgid "Please input your username and passphrase:"
+msgstr "請輸入您的使用者名稱及密碼："
 
-#: voting/templates/voting/welcome_page.html:30
+#: voting/templates/voting/welcome_page.html:31
 msgid "Continue"
 msgstr "繼續"
 
