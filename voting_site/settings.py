@@ -53,6 +53,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.locale.LocaleMiddleware',
 )
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.request',
+)
+
 ROOT_URLCONF = 'voting_site.urls'
 
 WSGI_APPLICATION = 'voting_site.wsgi.application'

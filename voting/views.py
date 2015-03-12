@@ -27,6 +27,7 @@ class VotingEventCreate(LoginRequiredMixin, CreateView):
     model = VotingEvent
     fields = VOTING_EVENT_FIELDS
     template_name = 'voting/voting_event_create.html'
+    context_object_name = 'event'
 
     def get_success_url(self):
         return self.object.url_edit
@@ -35,17 +36,19 @@ class VotingEventEdit(LoginRequiredMixin, UpdateView):
     model = VotingEvent
     fields = VOTING_EVENT_FIELDS
     template_name = 'voting/voting_event_edit.html'
+    context_object_name = 'event'
     success_url = reverse_lazy('voting_event_list')
 
 class VotingEventDelete(LoginRequiredMixin, DeleteView):
     model = VotingEvent
     template_name = 'voting/voting_event_delete.html'
     success_url = reverse_lazy('voting_event_list')
+    context_object_name = 'event'
 
 class VotingEventStatus(LoginRequiredMixin, DetailView):
     template_name = 'voting/voting_event_status.html'
     model = VotingEvent
-    context_object_name = 'voting_event'
+    context_object_name = 'event'
 
     def get_context_data(self, **kwargs):
         context = super(VotingEventStatus, self).get_context_data(**kwargs)
@@ -142,7 +145,7 @@ class VoterList(VoterMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(VoterList, self).get_context_data(**kwargs)
-        context['voting_event'] = self.get_voting_event()
+        context['event'] = self.get_voting_event()
         return context
 
 # vote views

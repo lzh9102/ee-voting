@@ -77,6 +77,8 @@ bootstrap theme.
 
       <!-- Page Content -->
       <div id="page-wrapper">
+        {% block pre-content %}
+        {% endblock %}
         {% block content %}
         {% endblock %}
       </div>

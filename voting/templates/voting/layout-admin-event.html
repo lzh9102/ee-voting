@@ -1,0 +1,18 @@
+{% extends 'voting/layout-admin.html' %}
+{% load i18n %}
+{% load voting.custom_helpers %}
+
+{% block pre-content %}
+<div class="row">
+  <div class="col-lg-12">
+    <h2>{% block title %}{{ event.title }}{% endblock %}</h2>
+    <p>
+      <ul class="nav nav-tabs">
+        {% navlink 'voting_event_status' event.id %}{% trans "Details" %}{% endnavlink %}
+        {% navlink 'voting_event_edit' event.id %}{% trans "Setting" %}{% endnavlink %}
+        {% navlink 'voter_list' event.id %}{% trans "Voters" %}{% endnavlink %}
+      </ul>
+    </p>
+  </div>
+</div>
+{% endblock %}
