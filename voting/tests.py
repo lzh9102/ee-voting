@@ -5,7 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from datetime import datetime
 from .models import *
-from .forms import parse_voters
+from .forms import parse_voters, AddVoterForm
 
 def login(client):
     credentials = {'username': 'hello', 'password': '1234'}
@@ -223,6 +223,23 @@ class VoterTests(TestCase):
         self.assertRaises(Exception, parse_voters, "  \tid")
 
     # TODO: add tests for voter wizard
+
+    def testVoterAddForm(self):
+        form = AddVoterForm({'voters_input': 'Voter3 voter3\nVoter4 voter4'})
+        self.assertTrue(form.is_valid())
+        form.save(self.event1)
+        self.assertEqual(self.event1.voters.all().count(), 3)
+        try:
+            voter3 = self.event1.voters.get(username='voter3')
+            voter4 = self.event1.voters.get(username='voter4')
+        except:
+            self.fail("voter not added into the database")
+        self.assertEqual(voter3.full_name, 'Voter3')
+        self.assertEqual(voter4.full_name, 'Voter4')
+
+        # empty input should be an error
+        form = AddVoterForm({'voters_input': '     \n   '})
+        self.assertFalse(form.is_valid())
 
     def testListVoters(self):
         response = self.client.get(reverse('voter_list',
