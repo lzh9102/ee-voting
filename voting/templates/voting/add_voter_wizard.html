@@ -14,6 +14,43 @@
   <div class="col-lg-12">
 
     <p>{% blocktrans with step=wizard.steps.step1 total=wizard.steps.count%}Step {{ step }} of {{ total }}{% endblocktrans %}</p>
+
+    {% if wizard.steps.current == '0' %}
+    <p>{% blocktrans %}Please input one or more voters in the format "<b>FullName</b> <b>Username</b>", one voter per line.{% endblocktrans %}
+    </p>
+    <p>
+      <a href="#voter-example-input" data-toggle="modal">
+        <i class="fa fa-fw fa-question-circle"></i>{% trans "Show Example Input" %}
+      </a>
+      <div id="voter-example-input" class="modal fade" aria-hidden="true" role="dialog">
+        <div class="modal-dialog model-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">{% trans "Example Input" %}</h4>
+            </div>
+            <div class="modal-body">
+              <div class="well">
+                Code Monkey cmonkey<br>
+                Boring Manager rob<br>
+              </div>
+              <p>{% trans "The above input will produce the following voters" %}</p>
+              <table class="table">
+                <thead>
+                  <th>{% trans "Username" %}</th><th>{% trans "Name" %}</th>
+                </thead>
+                <tbody>
+                  <tr><td>cmonkey</td><td>Code Monkey</td></tr>
+                  <tr><td>rub</td><td>Boring Manager</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p>
+    {% endif %}
+
     <form method="post">
       {% csrf_token %}
       <p>
