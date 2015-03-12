@@ -1,0 +1,36 @@
+{# List voters in a printable format #}
+{% load i18n %}
+<html>
+  <head>
+    <title>{% trans "Print Voters" %}</title>
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+      table, td, th {
+        border: 1px dashed #ccc;
+      }
+      td, th {
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <table>
+      <thead>
+        <th>{% trans "Name" %}</th>
+        <th>{% trans "Username" %}</th>
+        <th>{% trans "Passphrase" %}</th>
+      </thead>
+      <tbody>
+        {% for voter in voters %}
+        <tr>
+          <td>{{ voter.full_name }}</td>
+          <td>{{ voter.username }}</td>
+          <td>{{ voter.passphrase }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </body>
+</html>

@@ -148,6 +148,10 @@ class VoterList(VoterMixin, ListView):
         context['event'] = self.get_voting_event()
         return context
 
+# same os VoterList, but using a different template
+class VotersPrint(VoterList):
+    template_name = 'voting/voters_print.html'
+
 # vote views
 # these views don't require login
 

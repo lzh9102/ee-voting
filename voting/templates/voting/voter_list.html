@@ -16,6 +16,10 @@
             <i class="fa fa-fw fa-plus"></i>
             {% trans "Add Voters" %}
           </a>
+          <a class="btn btn-primary" href="{% url 'voters_print' event.pk %}" target="_blank">
+            <i class="fa fa-fw fa-print"></i>
+            {% trans "Print" %}
+          </a>
         </p>
         <p>
           <table class="table table-striped table-bordered table-hover">

@@ -22,6 +22,8 @@ urlpatterns = patterns('',
         name='add_voter_wizard'),
     url(r'^voting_event/(?P<event>\d+)/voter_list$', VoterList.as_view(),
         name='voter_list'),
+    url(r'^voting_event/(?P<event>\d+)/voters_print$', VotersPrint.as_view(),
+        name='voters_print'),
 
     # voting
     url(r'^$', WelcomePage.as_view(), name='welcome_page'),
