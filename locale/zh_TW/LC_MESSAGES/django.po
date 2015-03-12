@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-12 14:02+0800\n"
-"PO-Revision-Date: 2015-03-12 14:02+0800\n"
+"POT-Creation-Date: 2015-03-12 17:42+0800\n"
+"PO-Revision-Date: 2015-03-12 17:43+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -27,7 +27,7 @@ msgstr "第 %(line)d 行的格式不正確: %(content)s"
 msgid "Input"
 msgstr "輸入"
 
-#: voting/models.py:20 voting/templates/voting/voting_event_list.html:25
+#: voting/models.py:20 voting/templates/voting/voting_event_list.html:17
 msgid "Title"
 msgstr "標題"
 
@@ -44,21 +44,21 @@ msgid "Expiration Time"
 msgstr "結束時間"
 
 #: voting/models.py:41 voting/models.py:60
-#: voting/templates/voting/voting_event_edit.html:45
+#: voting/templates/voting/voting_event_edit.html:39
 msgid "Full Name"
 msgstr "全名"
 
-#: voting/models.py:61 voting/templates/voting/voter_list.html:32
+#: voting/models.py:61 voting/templates/voting/voter_list.html:24
 msgid "Username"
 msgstr "使用者名稱"
 
-#: voting/models.py:63 voting/templates/voting/voter_list.html:33
+#: voting/models.py:63 voting/templates/voting/voter_list.html:25
 msgid "Passphrase"
 msgstr "確認碼"
 
 #: voting/templates/voting/add_voter_wizard.html:9
 #: voting/templates/voting/voter_list.html:17
-#: voting/templates/voting/voting_event_edit.html:81
+#: voting/templates/voting/voting_event_edit.html:75
 msgid "Add Voters"
 msgstr "新增投票者"
 
@@ -72,8 +72,8 @@ msgid "ID"
 msgstr "ID"
 
 #: voting/templates/voting/add_voter_wizard.html:38
-#: voting/templates/voting/voter_list.html:31
-#: voting/templates/voting/voting_event_status.html:27
+#: voting/templates/voting/voter_list.html:23
+#: voting/templates/voting/voting_event_status.html:21
 msgid "Name"
 msgstr "名字"
 
@@ -125,13 +125,27 @@ msgid "Edit Candidate"
 msgstr "編輯候選人"
 
 #: voting/templates/voting/candidate_edit.html:18
-#: voting/templates/voting/voting_event_edit.html:26
+#: voting/templates/voting/voting_event_edit.html:20
 msgid "Save Changes"
 msgstr "儲存變更"
 
 #: voting/templates/voting/end_message.html:6
 msgid "Your vote has been saved. Thanks for using this site"
 msgstr "您的投票結果已儲存，感謝使用本系統"
+
+#: voting/templates/voting/layout-admin-event.html:11
+msgid "Details"
+msgstr "詳細資訊"
+
+#: voting/templates/voting/layout-admin-event.html:12
+msgid "Setting"
+msgstr "設定"
+
+#: voting/templates/voting/layout-admin-event.html:13
+#: voting/templates/voting/voter_list.html:11
+#: voting/templates/voting/voting_event_edit.html:68
+msgid "Voters"
+msgstr "投票者"
 
 #: voting/templates/voting/layout-admin.html:33
 #: voting/templates/voting/layout.html:30
@@ -143,9 +157,13 @@ msgid "Logout"
 msgstr "登出"
 
 #: voting/templates/voting/layout-admin.html:69
-#: voting/templates/voting/voting_event_list.html:8
-msgid "Voting Events"
-msgstr "投票活動"
+msgid "Voting Event List"
+msgstr "投票活動清單"
+
+#: voting/templates/voting/layout-admin.html:72
+#: voting/templates/voting/voting_event_create.html:9
+msgid "Create Voting Event"
+msgstr "新增投票活動"
 
 #: voting/templates/voting/layout.html:41
 msgid "Admin"
@@ -156,37 +174,18 @@ msgstr "管理界面"
 msgid "Hello, %(name)s! Please vote for a candidate"
 msgstr "%(name)s 您好！請選擇一個候選人"
 
-#: voting/templates/voting/voter_list.html:9
-#, python-format
-msgid "Voters for %(event)s"
-msgstr "%(event)s 的投票者"
-
-#: voting/templates/voting/voter_list.html:13
-#, python-format
-msgid "Back to %(event)s"
-msgstr "回到 %(event)s"
-
-#: voting/templates/voting/voter_list.html:25
-#: voting/templates/voting/voting_event_edit.html:74
-msgid "Voters"
-msgstr "投票者"
-
 #. Translators: Has the user voted yet? Yes or no.
-#: voting/templates/voting/voter_list.html:35
+#: voting/templates/voting/voter_list.html:27
 msgid "Voted"
 msgstr "已投票"
 
-#: voting/templates/voting/voter_list.html:45
+#: voting/templates/voting/voter_list.html:37
 msgid "Yes"
 msgstr "是"
 
-#: voting/templates/voting/voter_list.html:48
+#: voting/templates/voting/voter_list.html:40
 msgid "No"
 msgstr "否"
-
-#: voting/templates/voting/voting_event_create.html:9
-msgid "Create Voting Event"
-msgstr "新增投票活動"
 
 #: voting/templates/voting/voting_event_delete.html:8
 msgid "Cofirm Delete"
@@ -197,62 +196,58 @@ msgstr "確認刪除"
 msgid "Are you sure you want to delete <b>%(event)s</b>?"
 msgstr "您確定要刪除 <b>%(event)s</b> 嗎？"
 
-#: voting/templates/voting/voting_event_edit.html:9
-msgid "Edit Voting Event"
-msgstr "編輯投票活動"
-
-#: voting/templates/voting/voting_event_edit.html:19
+#: voting/templates/voting/voting_event_edit.html:13
 msgid "Settings"
 msgstr "設定"
 
-#: voting/templates/voting/voting_event_edit.html:38
-#: voting/templates/voting/voting_event_status.html:23
+#: voting/templates/voting/voting_event_edit.html:32
+#: voting/templates/voting/voting_event_status.html:17
 msgid "Candidates"
 msgstr "候選人"
 
-#: voting/templates/voting/voting_event_edit.html:46
-#: voting/templates/voting/voting_event_list.html:27
+#: voting/templates/voting/voting_event_edit.html:40
+#: voting/templates/voting/voting_event_list.html:19
 msgid "Actions"
 msgstr "動作"
 
-#: voting/templates/voting/voting_event_edit.html:54
-#: voting/templates/voting/voting_event_list.html:41
+#: voting/templates/voting/voting_event_edit.html:48
+#: voting/templates/voting/voting_event_list.html:33
 msgid "Edit"
 msgstr "編輯"
 
-#: voting/templates/voting/voting_event_edit.html:57
-#: voting/templates/voting/voting_event_list.html:44
+#: voting/templates/voting/voting_event_edit.html:51
+#: voting/templates/voting/voting_event_list.html:36
 msgid "Delete"
 msgstr "刪除"
 
-#: voting/templates/voting/voting_event_edit.html:67
+#: voting/templates/voting/voting_event_edit.html:61
 msgid "Add new candidate"
 msgstr "新增候選人"
 
-#: voting/templates/voting/voting_event_edit.html:77
+#: voting/templates/voting/voting_event_edit.html:71
 #, python-format
 msgid "There are %(num_voters)s voters for this event."
 msgstr "此活動總共有 %(num_voters)s 個投票者。"
 
-#: voting/templates/voting/voting_event_edit.html:86
+#: voting/templates/voting/voting_event_edit.html:80
 msgid "View Voter List"
 msgstr "檢視投票者清單"
 
-#: voting/templates/voting/voting_event_list.html:15
-msgid "Create voting event"
-msgstr "新增投票活動"
+#: voting/templates/voting/voting_event_list.html:8
+msgid "Voting Events"
+msgstr "投票活動"
 
-#: voting/templates/voting/voting_event_list.html:26
+#: voting/templates/voting/voting_event_list.html:18
 msgid "Expiration Date"
 msgstr "截止日期"
 
 #. Translators: Noun. Number of votes.
-#: voting/templates/voting/voting_event_status.html:29
+#: voting/templates/voting/voting_event_status.html:23
 msgid "Votes"
 msgstr "得票數"
 
 #. Translators: Number of voters who didn't vote for any candidate
-#: voting/templates/voting/voting_event_status.html:57
+#: voting/templates/voting/voting_event_status.html:51
 msgid "Not Voted"
 msgstr "尚未投票"
 
@@ -268,18 +263,18 @@ msgstr "請輸入您的使用者名稱及密碼："
 msgid "Continue"
 msgstr "繼續"
 
-#: voting/views.py:180
+#: voting/views.py:183
 msgid "The username or passphrase you input is invalid"
 msgstr "使用者名稱和確認碼不正確"
 
-#: voting/views.py:226
+#: voting/views.py:229
 msgid "Please choose one candidate"
 msgstr "請選擇一位候選人"
 
-#: voting/views.py:229
+#: voting/views.py:232
 msgid "Can only choose one candidate"
 msgstr "只能選擇一位候選人"
 
-#: voting/views.py:235
+#: voting/views.py:238
 msgid "The candidate you chose doesn't belong to this vote!"
 msgstr "您選擇的候選人不屬於此投票活動！"
