@@ -89,6 +89,7 @@ LOCALE_PATHS = (
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'public')
 
 # login/logout
 LOGIN_URL = '/admin/login'
