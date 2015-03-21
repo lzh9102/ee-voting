@@ -174,13 +174,19 @@ class WelcomePage(FormView):
         if voters:
             # TODO: check for multiple voters with the same (username, passphrase)
             voter = voters[0]
-            self.request.session['voter_id'] = voter.pk
-            return HttpResponseRedirect(reverse('vote'))
+
+            if voter.event.is_expired:
+                error = _("Sorry, the voting event has expired.")
+            else:
+                self.request.session['voter_id'] = voter.pk
+                return HttpResponseRedirect(reverse('vote'))
+        else:
+            error = _("The username or passphrase you input is invalid")
 
         # validation error, display the form again
         context = {
             'form': form,
-            'error': _("The username or passphrase you input is invalid"),
+            'error': error,
         }
         return render(self.request, self.template_name, context)
 
@@ -194,6 +200,12 @@ class VoteView(View):
         # redirect to welcome_page if no voter information in session
         if 'voter_id' not in request.session:
             return HttpResponseRedirect(reverse('welcome_page'))
+
+        # enforce expiration date
+        voter = Voter.objects.get(pk=request.session['voter_id'])
+        if voter.event.is_expired:
+            return HttpResponseRedirect(reverse('welcome_page'))
+
         return super(VoteView, self).dispatch(request, *args, **kwargs)
 
     def get_voter(self):

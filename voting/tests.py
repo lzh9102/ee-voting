@@ -10,6 +10,8 @@ from .forms import parse_voters, AddVoterForm
 NOW = datetime.now()
 ONE_WEEK_LATER = NOW + timedelta(days=7)
 TWO_WEEKS_LATER = NOW + timedelta(days=14)
+ONE_WEEK_AGO = NOW - timedelta(days=7)
+TWO_WEEKS_AGO = NOW - timedelta(days=14)
 
 def login(client):
     credentials = {'username': 'hello', 'password': '1234'}
@@ -273,6 +275,12 @@ class VotingTests(TestCase):
         self.voter3 = Voter.objects.create(event=self.event1,
                                            username='voter3')
 
+        self.event2 = VotingEvent.objects.create(title='vote2',
+                                                 starting_date=NOW,
+                                                 expiration_date=ONE_WEEK_LATER)
+        self.event2_candidate = Candidate.objects.create(event=self.event2,
+                                                         full_name='candidate')
+
     def testWelcomePageReject(self):
         client = Client()
 
@@ -349,6 +357,14 @@ class VotingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/vote.html')
 
+        # Shouldn't be able to vote for a candidate belonging to another event
+        response = client.post(reverse('vote'), {
+            'choice': [self.event2_candidate.pk]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'voting/vote.html')
+        self.assertEqual(self.voter1.choice, None)
+
         # Vote for exactly one candidate should show the final message.
         response = client.post(reverse('vote'), {
             'choice': [chosen_candidate.pk]
@@ -397,3 +413,29 @@ class VotingTests(TestCase):
         voter1 = Voter.objects.get(pk=self.voter1.pk)
         self.assertEqual(voter1.choice, None)
 
+    def testExpiredEvent(self):
+        """ After an event expires, the voters are no longer allowed to vote
+            on the event. """
+        # set the event to have expired one week ago
+        self.event1.starting_date = TWO_WEEKS_AGO
+        self.event1.expiration_date = ONE_WEEK_AGO
+        self.event1.save()
+
+        # login to the welcome page should return an error
+        client = Client()
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('error', response.context)
+
+        # shouldn't be allowed to access the voting page
+        response = client.get(reverse('vote'))
+        self.assertRedirects(response, reverse('welcome_page'))
+
+        # shouldn't be allowed to vote
+        response = client.post(reverse('vote'), {
+            'choice': [self.candidate1.pk]
+        })
+        self.assertRedirects(response, reverse('welcome_page'))

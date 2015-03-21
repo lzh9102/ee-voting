@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
+from datetime import datetime
 import random, string
 
 def default_starting_time():
@@ -35,6 +36,10 @@ class VotingEvent(models.Model):
     @property
     def url_voters(self):
         return reverse('voter_list', kwargs={'event': self.pk})
+
+    @property
+    def is_expired(self):
+        return self.expiration_date <= datetime.now()
 
 class Candidate(models.Model):
     event = models.ForeignKey(VotingEvent, related_name='candidates')
