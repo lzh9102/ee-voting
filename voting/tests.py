@@ -3,9 +3,13 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import *
 from .forms import parse_voters, AddVoterForm
+
+NOW = datetime.now()
+ONE_WEEK_LATER = NOW + timedelta(days=7)
+TWO_WEEKS_LATER = NOW + timedelta(days=14)
 
 def login(client):
     credentials = {'username': 'hello', 'password': '1234'}
@@ -29,8 +33,8 @@ class VotingEventTests(TestCase):
         formdata = {
             'title': 'abcd',
             'description': '123',
-            'starting_date': '2015-01-01 00:00:00',
-            'expiration_date': '2015-01-02 00:00:00',
+            'starting_date': NOW,
+            'expiration_date': ONE_WEEK_LATER,
         }
         response = self.client.post(reverse('voting_event_create'), formdata)
         new_vote = VotingEvent.objects.get(title='abcd')
@@ -45,8 +49,8 @@ class VotingEventTests(TestCase):
         formdata = {
             'title': 'vote2',
             'description': 'vote2 - description',
-            'starting_date': datetime(2015, 12, 23, 1, 2, 3),
-            'expiration_date': datetime(2015, 12, 23, 2, 2, 3)
+            'starting_date': NOW,
+            'expiration_date': ONE_WEEK_LATER,
         }
         response = self.client.post(self.vote1.url_edit, formdata)
         self.assertRedirects(response, reverse('voting_event_list'))
@@ -104,8 +108,8 @@ class VoterTests(TestCase):
 
     def testGeneratePassphrase(self):
         event = VotingEvent.objects.create(title='vote1',
-                                           starting_date='2015-01-01',
-                                           expiration_date='2015-02-01')
+                                           starting_date=NOW,
+                                           expiration_date=ONE_WEEK_LATER)
         voter = Voter.objects.create(event=event,
                                      full_name='John Smith',
                                      username='johnsmith')
@@ -115,8 +119,8 @@ class CandidateTests(TestCase):
 
     def setUp(self):
         self.event = VotingEvent.objects.create(title='vote1',
-                                                starting_date='2015-01-01',
-                                                expiration_date='2015-02-01')
+                                                starting_date=NOW,
+                                                expiration_date=ONE_WEEK_LATER)
         self.candidate1 = Candidate.objects.create(event=self.event,
                                                    full_name='candidate1')
         self.candidate2 = Candidate.objects.create(event=self.event,
@@ -176,16 +180,16 @@ class VoterTests(TestCase):
 
     def setUp(self):
         self.event1 = VotingEvent.objects.create(title='vote1',
-                                                starting_date='2015-01-01',
-                                                expiration_date='2015-02-01')
+                                                starting_date=NOW,
+                                                expiration_date=ONE_WEEK_LATER)
         self.candidate1 = Candidate.objects.create(event=self.event1,
                                                    full_name='candidate1')
         self.voter1 = Voter.objects.create(event=self.event1,
                                            full_name='Voter1',
                                            username='voter1')
         self.event2 = VotingEvent.objects.create(title='vote2',
-                                                 starting_date='2015-01-01',
-                                                 expiration_date='2015-02-01')
+                                                 starting_date=NOW,
+                                                 expiration_date=ONE_WEEK_LATER)
         self.candidate2 = Candidate.objects.create(event=self.event2,
                                                    full_name='candidate2')
         self.voter2 = Voter.objects.create(event=self.event2,
@@ -256,8 +260,8 @@ class VotingTests(TestCase):
         login(self.client)
 
         self.event1 = VotingEvent.objects.create(title='vote1',
-                                                 starting_date='2015-01-01',
-                                                 expiration_date='2015-02-01')
+                                                 starting_date=NOW,
+                                                 expiration_date=ONE_WEEK_LATER)
         self.candidate1 = Candidate.objects.create(event=self.event1,
                                                    full_name='candidate1')
         self.candidate2 = Candidate.objects.create(event=self.event1,
