@@ -21,6 +21,7 @@ VOTING_EVENT_FIELDS = ['title', 'description', 'starting_date', 'expiration_date
 
 class VotingEventList(LoginRequiredMixin, ListView):
     model = VotingEvent
+    queryset = model.objects.all().order_by('-expiration_date')
     template_name = 'voting/voting_event_list.html'
 
 class VotingEventCreate(LoginRequiredMixin, CreateView):
