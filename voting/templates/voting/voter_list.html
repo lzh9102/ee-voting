@@ -18,7 +18,11 @@
           </a>
           <a class="btn btn-primary" href="{% url 'voters_print' event.pk %}" target="_blank">
             <i class="fa fa-fw fa-print"></i>
-            {% trans "Print" %}
+            {% trans "Print Credentials" %}
+          </a>
+          <a class="btn btn-primary" href="{% url 'voting_result_print' event.pk %}" target="_blank">
+            <i class="fa fa-fw fa-print"></i>
+            {% trans "Print Voting Results" %}
           </a>
         </p>
         <p>

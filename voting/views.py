@@ -153,6 +153,10 @@ class VoterList(VoterMixin, ListView):
 class VotersPrint(VoterList):
     template_name = 'voting/voters_print.html'
 
+# same as VotersPrint but with different template
+class VotingResultPrint(VotersPrint):
+    template_name = 'voting/voting_result_print.html'
+
 # vote views
 # these views don't require login
 
