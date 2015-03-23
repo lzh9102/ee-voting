@@ -46,6 +46,9 @@ class AddVoterForm(forms.Form):
             self._voters = parse_voters(data)
         except Exception as e:
             raise forms.ValidationError(str(e))
+        # don't allow empty input
+        if not self._voters:
+            raise forms.ValidationError(_("You must input at least 1 voter"))
         return data
 
     def save(self, voting_event):

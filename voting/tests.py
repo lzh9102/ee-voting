@@ -3,9 +3,15 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import *
-from .forms import parse_voters
+from .forms import parse_voters, AddVoterForm
+
+NOW = datetime.now()
+ONE_WEEK_LATER = NOW + timedelta(days=7)
+TWO_WEEKS_LATER = NOW + timedelta(days=14)
+ONE_WEEK_AGO = NOW - timedelta(days=7)
+TWO_WEEKS_AGO = NOW - timedelta(days=14)
 
 def login(client):
     credentials = {'username': 'hello', 'password': '1234'}
@@ -29,8 +35,8 @@ class VotingEventTests(TestCase):
         formdata = {
             'title': 'abcd',
             'description': '123',
-            'starting_date': '2015-01-01 00:00:00',
-            'expiration_date': '2015-01-02 00:00:00',
+            'starting_date': NOW,
+            'expiration_date': ONE_WEEK_LATER,
         }
         response = self.client.post(reverse('voting_event_create'), formdata)
         new_vote = VotingEvent.objects.get(title='abcd')
@@ -45,8 +51,8 @@ class VotingEventTests(TestCase):
         formdata = {
             'title': 'vote2',
             'description': 'vote2 - description',
-            'starting_date': datetime(2015, 12, 23, 1, 2, 3),
-            'expiration_date': datetime(2015, 12, 23, 2, 2, 3)
+            'starting_date': NOW,
+            'expiration_date': ONE_WEEK_LATER,
         }
         response = self.client.post(self.vote1.url_edit, formdata)
         self.assertRedirects(response, reverse('voting_event_list'))
@@ -104,8 +110,8 @@ class VoterTests(TestCase):
 
     def testGeneratePassphrase(self):
         event = VotingEvent.objects.create(title='vote1',
-                                           starting_date='2015-01-01',
-                                           expiration_date='2015-02-01')
+                                           starting_date=NOW,
+                                           expiration_date=ONE_WEEK_LATER)
         voter = Voter.objects.create(event=event,
                                      full_name='John Smith',
                                      username='johnsmith')
@@ -115,8 +121,8 @@ class CandidateTests(TestCase):
 
     def setUp(self):
         self.event = VotingEvent.objects.create(title='vote1',
-                                                starting_date='2015-01-01',
-                                                expiration_date='2015-02-01')
+                                                starting_date=NOW,
+                                                expiration_date=ONE_WEEK_LATER)
         self.candidate1 = Candidate.objects.create(event=self.event,
                                                    full_name='candidate1')
         self.candidate2 = Candidate.objects.create(event=self.event,
@@ -176,16 +182,16 @@ class VoterTests(TestCase):
 
     def setUp(self):
         self.event1 = VotingEvent.objects.create(title='vote1',
-                                                starting_date='2015-01-01',
-                                                expiration_date='2015-02-01')
+                                                starting_date=NOW,
+                                                expiration_date=ONE_WEEK_LATER)
         self.candidate1 = Candidate.objects.create(event=self.event1,
                                                    full_name='candidate1')
         self.voter1 = Voter.objects.create(event=self.event1,
                                            full_name='Voter1',
                                            username='voter1')
         self.event2 = VotingEvent.objects.create(title='vote2',
-                                                 starting_date='2015-01-01',
-                                                 expiration_date='2015-02-01')
+                                                 starting_date=NOW,
+                                                 expiration_date=ONE_WEEK_LATER)
         self.candidate2 = Candidate.objects.create(event=self.event2,
                                                    full_name='candidate2')
         self.voter2 = Voter.objects.create(event=self.event2,
@@ -224,6 +230,23 @@ class VoterTests(TestCase):
 
     # TODO: add tests for voter wizard
 
+    def testVoterAddForm(self):
+        form = AddVoterForm({'voters_input': 'Voter3 voter3\nVoter4 voter4'})
+        self.assertTrue(form.is_valid())
+        form.save(self.event1)
+        self.assertEqual(self.event1.voters.all().count(), 3)
+        try:
+            voter3 = self.event1.voters.get(username='voter3')
+            voter4 = self.event1.voters.get(username='voter4')
+        except:
+            self.fail("voter not added into the database")
+        self.assertEqual(voter3.full_name, 'Voter3')
+        self.assertEqual(voter4.full_name, 'Voter4')
+
+        # empty input should be an error
+        form = AddVoterForm({'voters_input': '     \n   '})
+        self.assertFalse(form.is_valid())
+
     def testListVoters(self):
         response = self.client.get(reverse('voter_list',
                                            kwargs={'event': self.event1.pk}))
@@ -239,8 +262,8 @@ class VotingTests(TestCase):
         login(self.client)
 
         self.event1 = VotingEvent.objects.create(title='vote1',
-                                                 starting_date='2015-01-01',
-                                                 expiration_date='2015-02-01')
+                                                 starting_date=NOW,
+                                                 expiration_date=ONE_WEEK_LATER)
         self.candidate1 = Candidate.objects.create(event=self.event1,
                                                    full_name='candidate1')
         self.candidate2 = Candidate.objects.create(event=self.event1,
@@ -251,6 +274,12 @@ class VotingTests(TestCase):
                                            username='voter2')
         self.voter3 = Voter.objects.create(event=self.event1,
                                            username='voter3')
+
+        self.event2 = VotingEvent.objects.create(title='vote2',
+                                                 starting_date=NOW,
+                                                 expiration_date=ONE_WEEK_LATER)
+        self.event2_candidate = Candidate.objects.create(event=self.event2,
+                                                         full_name='candidate')
 
     def testWelcomePageReject(self):
         client = Client()
@@ -328,6 +357,14 @@ class VotingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/vote.html')
 
+        # Shouldn't be able to vote for a candidate belonging to another event
+        response = client.post(reverse('vote'), {
+            'choice': [self.event2_candidate.pk]
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'voting/vote.html')
+        self.assertEqual(self.voter1.choice, None)
+
         # Vote for exactly one candidate should show the final message.
         response = client.post(reverse('vote'), {
             'choice': [chosen_candidate.pk]
@@ -376,3 +413,29 @@ class VotingTests(TestCase):
         voter1 = Voter.objects.get(pk=self.voter1.pk)
         self.assertEqual(voter1.choice, None)
 
+    def testExpiredEvent(self):
+        """ After an event expires, the voters are no longer allowed to vote
+            on the event. """
+        # set the event to have expired one week ago
+        self.event1.starting_date = TWO_WEEKS_AGO
+        self.event1.expiration_date = ONE_WEEK_AGO
+        self.event1.save()
+
+        # login to the welcome page should return an error
+        client = Client()
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('error', response.context)
+
+        # shouldn't be allowed to access the voting page
+        response = client.get(reverse('vote'))
+        self.assertRedirects(response, reverse('welcome_page'))
+
+        # shouldn't be allowed to vote
+        response = client.post(reverse('vote'), {
+            'choice': [self.candidate1.pk]
+        })
+        self.assertRedirects(response, reverse('welcome_page'))
