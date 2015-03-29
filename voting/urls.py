@@ -24,7 +24,7 @@ urlpatterns = patterns('',
         name='voter_list'),
     url(r'^voting_event/(?P<event>\d+)/voters_print$', VotersPrint.as_view(),
         name='voters_print'),
-    url(r'^voting_event/(?P<event>\d+)/vorint_result_print$', VotingResultPrint.as_view(),
+    url(r'^voting_event/(?P<event>\d+)/voting_result_print$', VotingResultPrint.as_view(),
         name='voting_result_print'),
 
     # voting
