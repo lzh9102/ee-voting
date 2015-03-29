@@ -99,10 +99,18 @@ class Voter(models.Model):
     def voted(self):
         return self.choices.all().exists()
 
+    @property
+    def voted_time(self):
+        if self.voted:
+            return self.votes.all()[0].modified_time # TODO: find the latest time
+        else:
+            return None
+
 class Vote(models.Model):
     voter = models.ForeignKey(Voter, related_name='votes')
     candidate = models.ForeignKey(Candidate, related_name='votes')
     choice = models.CharField(choices=VOTE_CHOICE, max_length=2)
+    modified_time = models.DateTimeField(auto_now=True, auto_now_add=True)
 
     @property
     def agree(self):

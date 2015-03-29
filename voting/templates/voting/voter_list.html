@@ -35,6 +35,7 @@
                 <td>
                   {% if voter.voted %}
                   <i class="fa fa-fw fa-check" title="{% trans "Yes" %}"></i>
+                  ({{ voter.voted_time }})
                   {% else %}
                   <i class="fa fa-fw fa-times" title="{% trans "No" %}"></i>
                   {% endif %}
