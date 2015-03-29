@@ -9,6 +9,7 @@ from django.utils.translation import ugettext as _
 from django.contrib.formtools.wizard.views import SessionWizardView as MyWizardView
 from .forms import *
 from .models import *
+import re
 
 class LoginRequiredMixin:
 
@@ -58,11 +59,7 @@ class VotingEventStatus(LoginRequiredMixin, DetailView):
         candidates = list(self.object.candidates.all())
         candidates.sort(key=lambda candidate: -candidate.voters.all().count())
 
-        # voters who have not voted
-        not_voted_voters = self.object.voters.filter(choice=None)
-
         context['candidates'] = candidates
-        context['not_voted_voters'] = not_voted_voters
         return context
 
 class RedirectToVotingEvent:
@@ -238,30 +235,47 @@ class VoteView(View):
         self.request.session.pop('voter_id', None)
 
     def post(self, request):
+        # TODO: form display and validation should be extract to a form class
         voter = self.get_voter()
-        choice = request.POST.getlist('choice')
+
+        choices = {}
+        for choice in request.POST:
+            match = re.match(r'^candidate_(?P<event>\d+)$', choice)
+            if match:
+                candidate_id = match.group('event')
+                candidate = Candidate.objects.get(pk=candidate_id)
+                choices[candidate] = request.POST[choice]
 
         if 'cancel' in request.POST: # user cancels, return to welcome page
             self.clear_session()
             return HttpResponseRedirect(reverse('welcome_page'))
 
-        if not choice:
+        if not choices:
             return self.display_form(request,
                                      error=_("Please choose one candidate"))
-        elif len(choice) > 1:
-            return self.display_form(request,
-                                     error=_("Can only choose one candidate"))
 
-        # get candidate object
-        candidate = Candidate.objects.get(pk=choice[0])
-        if candidate.event != voter.event:
-            return self.display_form(request,
-                                     error=_("The candidate you chose doesn't belong to this vote!"))
+        # check if the candidates are all in the same event
+        for candidate in choices:
+            if candidate.event != voter.event:
+                return self.display_form(request,
+                                         error=_("The candidate you chose doesn't belong to this vote!"))
 
-        # vote
-        voter.vote_for(candidate)
-        voter.save()
+        if 'confirm' in request.POST:
+            for candidate in voter.event.candidates.all():
+                if (candidate not in choices) or (choices[candidate] == 'N'): # not selected
+                    voter.unvote(candidate)
+                else:
+                    agree = (choices[candidate] == 'A')
+                    # vote
+                    voter.vote_for(candidate, agree=agree)
 
-        self.clear_session()
+            voter.save()
 
-        return render(request, 'voting/end_message.html')
+            self.clear_session()
+            return render(request, 'voting/end_message.html')
+        else: # not confirmed
+            return render(request, 'voting/vote_confirm.html', {
+                'choices': choices,
+            })
+
+

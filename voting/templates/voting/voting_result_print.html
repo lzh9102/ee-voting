@@ -20,15 +20,15 @@
     <table>
       <thead>
         <th>{% trans "Name" %}</th>
-        <th>{% trans "Result" %}</th>
+        <th>{% trans "Voted Date" %}</th>
       </thead>
       <tbody>
         {% for voter in voters %}
         <tr>
           <td>{{ voter.full_name }}</td>
           <td>
-            {% if voter.choice %}
-            <b>{{ voter.choice }}</b>
+            {% if voter.voted %}
+            <b>{{ voter.voted_time }}</b>
             {% else %}
             {% trans "Not yet voted" %}
             {% endif %}

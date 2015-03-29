@@ -74,37 +74,37 @@ class VotingEventTests(TestCase):
         self.assertEqual(VotingEvent.objects.filter(pk=self.vote1.pk).count(), 0)
 
     def testStatus(self):
-        vote = VotingEvent.objects.create(title='vote1',
+        event = VotingEvent.objects.create(title='vote1',
                                           expiration_date='2015-01-01 00:00:00')
-        candidate1 = Candidate.objects.create(event=vote,
+        candidate1 = Candidate.objects.create(event=event,
                                               full_name='Candidate1')
-        candidate2 = Candidate.objects.create(event=vote,
+        candidate2 = Candidate.objects.create(event=event,
                                               full_name='Candidate2')
-        voter1 = Voter.objects.create(event=vote,
+        voter1 = Voter.objects.create(event=event,
                                       full_name='voter1',
-                                      username='voter1',
-                                      choice=candidate1)
-        voter2 = Voter.objects.create(event=vote,
+                                      username='voter1')
+        voter1.vote_for(candidate1, agree=True)
+
+        voter2 = Voter.objects.create(event=event,
                                       full_name='voter2',
-                                      username='voter2',
-                                      choice=candidate2)
-        voter3 = Voter.objects.create(event=vote,
+                                      username='voter2')
+        voter2.vote_for(candidate2, agree=True)
+
+        voter3 = Voter.objects.create(event=event,
                                       full_name='voter3',
-                                      username='voter3',
-                                      choice=candidate2)
-        voter4 = Voter.objects.create(event=vote,
+                                      username='voter3')
+        voter3.vote_for(candidate2, agree=True)
+
+        voter4 = Voter.objects.create(event=event,
                                       full_name='voter4',
                                       username='voter4') # not voted
 
         response = self.client.get(reverse('voting_event_status',
-                                           kwargs={'pk': vote.pk}))
+                                           kwargs={'pk': event.pk}))
         self.assertIn('candidates', response.context)
         candidates = response.context['candidates']
         # candidate2 get more votes than candidate1
         self.assertEqual(candidates, [candidate2, candidate1])
-
-        self.assertIn('not_voted_voters', response.context)
-        self.assertEqual(list(response.context['not_voted_voters']), [voter4])
 
 class VoterTests(TestCase):
 
@@ -127,14 +127,16 @@ class CandidateTests(TestCase):
                                                    full_name='candidate1')
         self.candidate2 = Candidate.objects.create(event=self.event,
                                                    full_name='candidate2')
+
         self.voter1 = Voter.objects.create(event=self.event,
                                            full_name='voter1',
-                                           username='voter1',
-                                           choice=self.candidate1)
+                                           username='voter1')
+        self.voter1.vote_for(self.candidate1, agree=True)
+
         self.voter2 = Voter.objects.create(event=self.event,
                                            full_name='voter2',
-                                           username='voter2',
-                                           choice=self.candidate2)
+                                           username='voter2')
+        self.voter2.vote_for(self.candidate2, agree=False)
         login(self.client)
 
     def testCandidateCreate(self):
@@ -201,23 +203,37 @@ class VoterTests(TestCase):
 
     def testVoterModelVote(self):
         # should't have a default candidate
-        self.assertEqual(self.voter1.choice, None)
+        self.assertEqual(self.voter1.votes.count(), 0)
 
         # vote for the candidate
         try:
-            self.voter1.vote_for(self.candidate1)
+            self.voter1.vote_for(self.candidate1, agree=True)
         except:
             self.fail("voter.vote_for() is broken")
 
         # verify voter1 has chosen candidate1
-        self.assertEqual(self.voter1.choice, self.candidate1)
+        self.assertEqual(self.voter1.votes.count(), 1)
+        vote = self.voter1.votes.all()[0]
+        self.assertIsInstance(vote, Vote)
+        self.assertEqual(vote.candidate, self.candidate1)
+        self.assertEqual(vote.agree, True)
+
+        # change the choice to 'disagree'
+        self.voter1.vote_for(self.candidate1, agree=False)
+
+        # verify the choice is changed to 'disagree'
+        self.assertEqual(self.voter1.votes.count(), 1)
+        vote = self.voter1.votes.all()[0]
+        self.assertIsInstance(vote, Vote)
+        self.assertEqual(vote.candidate, self.candidate1)
+        self.assertEqual(vote.agree, False)
 
         # voter2 belongs to vote2, candidate1 belongs to vote1
         # voter2 shouldn't be able to vote for candidate1
         self.assertRaises(ValidationError,
-                          self.voter2.vote_for, self.candidate1),
+                          self.voter2.vote_for, self.candidate1, agree=True),
         # voter2's choice is not changed by an error vote
-        self.assertEqual(self.voter2.choice, None)
+        self.assertFalse(self.voter2.votes.exists())
 
     def testParseVoters(self):
         result = parse_voters("  The First Voter voter1\nSecond Voter voter2 \n  \n ")
@@ -255,6 +271,17 @@ class VoterTests(TestCase):
         except:
             self.fail("'voters' should be in context")
         self.assertEqual(len(voters), 1) # event1 has one candidate
+
+    def testUnvote(self):
+        self.voter1.vote_for(self.candidate1, agree=True)
+        self.assertTrue(self.voter1.votes.exists())
+        self.voter1.unvote(self.candidate1)
+        self.assertFalse(self.voter1.votes.exists())
+        # unvote again doesn't throw an exception
+        try:
+            self.voter1.unvote(self.candidate1)
+        except:
+            self.fail("unvote() an not-voted candidate shouldn't crash")
 
 class VotingTests(TestCase):
 
@@ -308,24 +335,15 @@ class VotingTests(TestCase):
         self.assertIn('form', response.context)
         self.assertIn('error', response.context)
 
-    def testVotingProgess(self):
+    def testVoting(self):
+        """ For each candidate, the voter can either
+              1. select "agree" or "disagree"
+              2. do nothing
+        """
+
         client = Client()
 
-        # The voter is allowed to change his/her decision for an indefinite
-        # number of times. We'll test the situation that voter1 votes for
-        # candidate1 at first, but later he changes his mind and want to vote
-        # for candidate2.
-
-        # voter1 votes for candidate1
-        self.runVotingProcess(client, self.candidate1)
-
-        # voter1 changes his mind and votes for candidate2
-        self.runVotingProcess(client, self.candidate2)
-
-    def runVotingProcess(self, client, chosen_candidate):
-        """ Run the voting process and make assertions """
-
-        # Input a correct voter/passphrase pair.
+        # Sign in with voter1
         response = client.post(reverse('welcome_page'), {
             'username': self.voter1.username,
             'passphrase': self.voter1.passphrase,
@@ -349,32 +367,30 @@ class VotingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/vote.html')
 
-        # Just in case, if the client submits multiple clients, it should also
-        # be an error
-        response = client.post(reverse('vote'), {
-            'choice': [self.candidate1.pk, self.candidate2.pk]
-        })
+        # After voting without 'confirm' inside the POST dict, the confirm page
+        # should be shown.
+        formdata = {
+            'candidate_%d' % self.candidate1.pk: 'A', # agree
+            'candidate_%d' % self.candidate2.pk: 'D', # disagree
+        }
+        response = client.post(reverse('vote'), formdata)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'voting/vote.html')
+        self.assertTemplateUsed(response, 'voting/vote_confirm.html')
 
-        # Shouldn't be able to vote for a candidate belonging to another event
-        response = client.post(reverse('vote'), {
-            'choice': [self.event2_candidate.pk]
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'voting/vote.html')
-        self.assertEqual(self.voter1.choice, None)
-
-        # Vote for exactly one candidate should show the final message.
-        response = client.post(reverse('vote'), {
-            'choice': [chosen_candidate.pk]
-        })
+        # confirm to save the result
+        formdata['confirm'] = True
+        response = client.post(reverse('vote'), formdata)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/end_message.html')
 
+        # FIXME: content of the html templates are not tested
+
         # voter1.choice should be updated in the database
         voter1 = Voter.objects.get(pk=self.voter1.pk)
-        self.assertEqual(voter1.choice, chosen_candidate)
+        self.assertTrue(voter1.votes.filter(candidate=self.candidate1).exists())
+        self.assertEqual(voter1.votes.get(candidate=self.candidate1).choice, 'A')
+        self.assertTrue(voter1.votes.filter(candidate=self.candidate2).exists())
+        self.assertEqual(voter1.votes.get(candidate=self.candidate2).choice, 'D')
 
         # After that, the welcome page should not redirect anymore
         response = client.get(reverse('welcome_page'))
@@ -383,6 +399,26 @@ class VotingTests(TestCase):
         # The vote page should redirect back to the welcome page
         response = client.get(reverse('vote'))
         self.assertRedirects(response, reverse('welcome_page'))
+
+        # vote again
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase,
+        }, follow=True)
+        self.assertRedirects(response, reverse('vote'))
+        formdata = {
+            'candidate_%d' % self.candidate1.pk: 'D', # agree
+            'confirm': True,
+        }
+        response = client.post(reverse('vote'), formdata)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'voting/end_message.html')
+        self.assertEqual(self.voter1.votes.all().count(), 1)
+        vote = self.voter1.votes.all()[0]
+        self.assertEqual(vote.candidate, self.candidate1)
+        self.assertEqual(vote.choice, 'D')
+
+        # TODO: select 'N' for all candidates should be disallowed
 
     def testEmptyUsernameError(self):
         """ Submitting an empty username/password should throw an exception """
@@ -411,7 +447,7 @@ class VotingTests(TestCase):
 
         # the database shouldn't have changed
         voter1 = Voter.objects.get(pk=self.voter1.pk)
-        self.assertEqual(voter1.choice, None)
+        self.assertFalse(voter1.choices.all().exists())
 
     def testExpiredEvent(self):
         """ After an event expires, the voters are no longer allowed to vote
