@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, IntegrityError
 from datetime import datetime, timedelta
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
@@ -15,6 +15,11 @@ PASSPHRASE_LENGTH = 8
 def generate_passphrase():
     return ''.join([random.choice(string.ascii_uppercase + string.digits)
                     for i in range(PASSPHRASE_LENGTH)])
+
+VOTE_CHOICE = (
+    ('A', _('Agree')),
+    ('D', _('Disagree')),
+)
 
 class VotingEvent(models.Model):
     title = models.CharField(max_length=256, verbose_name=_("Title"))
@@ -61,15 +66,44 @@ class Voter(models.Model):
     username = models.CharField(max_length=64, verbose_name=_("Username"))
     passphrase = models.CharField(max_length=128, default=generate_passphrase,
                                   verbose_name=_("Passphrase"))
-    choice = models.ForeignKey(Candidate, related_name='voters',
-                               blank=True, null=True, on_delete=models.SET_NULL)
+    choices = models.ManyToManyField(Candidate, related_name='voters',
+                                     through='Vote')
 
-    def vote_for(self, candidate):
+    # TODO: change the name of this function to 'set_choice'
+    def vote_for(self, candidate, agree):
+        assert(isinstance(candidate, Candidate))
+        assert(type(agree) == bool)
+
+        # should only vote for candidates in the same voting event
+        if candidate.event != self.event:
+            # FIXME: this should be IntegrityError
+            raise ValidationError("candidate and voter doesn't belong to the same voting event")
+
+        # get the vote relationship between voter and candidate
+        (vote, created) = Vote.objects.get_or_create(voter=self, candidate=candidate)
+
+        if agree:
+            vote.choice = 'A'
+        else:
+            vote.choice = 'D'
+
+        vote.save()
+
+    def unvote(self, candidate):
         assert(isinstance(candidate, Candidate))
         if candidate.event != self.event:
-            raise ValidationError("candidate and voter doesn't belong to the same voting event")
-        self.choice = candidate
+            raise IntegrityError("candidate and voter don't belong to the same event")
+        Vote.objects.filter(voter=self, candidate=candidate).delete()
 
     @property
     def voted(self):
-        return self.choice != None
+        return self.choices.all().exists()
+
+class Vote(models.Model):
+    voter = models.ForeignKey(Voter, related_name='votes')
+    candidate = models.ForeignKey(Candidate, related_name='votes')
+    choice = models.CharField(choices=VOTE_CHOICE, max_length=2)
+
+    @property
+    def agree(self):
+        return self.choice == 'A'

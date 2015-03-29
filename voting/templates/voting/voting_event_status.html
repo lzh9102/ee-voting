@@ -47,8 +47,6 @@
     {% for candidate in candidates %}
       {label: "{{ candidate }}", value: {{ candidate.voters.all.count }}},
     {% endfor %}
-      {# Translators: Number of voters who didn't vote for any candidate #}
-      {label: "{% trans "Not Voted" %}", value: {{ not_voted_voters.count }}}
     ]
   });
 </script>

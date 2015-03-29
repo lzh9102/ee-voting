@@ -30,8 +30,12 @@
         {% for candidate in candidates %}
         <div class="radio">
           <label>
-            <input type="radio" name="choice" value="{{ candidate.pk }}">
             {{ candidate.full_name }}
+            <select class="form-control" name="candidate_{{ candidate.pk }}">
+              <option class="form-control" value="N">{% trans "Not Selected" %}</option>
+              <option class="form-control" value="A">{% trans "Agree" %}</option>
+              <option class="form-control" value="D">{% trans "Disagree" %}</option>
+            </select>
           </label>
         </div>
       {% endfor %}
