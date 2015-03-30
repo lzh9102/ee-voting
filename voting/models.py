@@ -65,6 +65,14 @@ class Candidate(models.Model):
     def voters(self):
         return event.voters.filter(choice=self)
 
+    @property
+    def agree_votes(self):
+        return Vote.objects.filter(candidate=self, choice='A')
+
+    @property
+    def disagree_votes(self):
+        return Vote.objects.filter(candidate=self, choice='D')
+
 class Voter(models.Model):
     event = models.ForeignKey(VotingEvent, related_name='voters')
     full_name = models.CharField(max_length=128, verbose_name=_("Full Name"))
