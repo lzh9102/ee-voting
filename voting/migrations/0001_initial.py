@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 import voting.models
-import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -15,8 +14,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Candidate',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, auto_created=True, verbose_name='ID')),
-                ('full_name', models.CharField(max_length=128, verbose_name='Full Name')),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('full_name', models.CharField(verbose_name='Full Name', max_length=128)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='Vote',
+            fields=[
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('choice', models.CharField(max_length=2, choices=[('A', 'Agree'), ('D', 'Disagree')])),
+                ('modified_time', models.DateTimeField(auto_now_add=True, auto_now=True)),
+                ('candidate', models.ForeignKey(to='voting.Candidate', related_name='votes')),
             ],
             options={
             },
@@ -25,11 +36,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Voter',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, auto_created=True, verbose_name='ID')),
-                ('full_name', models.CharField(max_length=128, verbose_name='Full Name')),
-                ('username', models.CharField(max_length=64, verbose_name='Username')),
-                ('passphrase', models.CharField(max_length=128, default=voting.models.generate_passphrase, verbose_name='Passphrase')),
-                ('choice', models.ForeignKey(to='voting.Candidate', null=True, blank=True, related_name='voters', on_delete=django.db.models.deletion.SET_NULL)),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('full_name', models.CharField(verbose_name='Full Name', max_length=128)),
+                ('username', models.CharField(verbose_name='Username', max_length=64)),
+                ('passphrase', models.CharField(verbose_name='Passphrase', max_length=128, default=voting.models.generate_passphrase)),
+                ('choices', models.ManyToManyField(to='voting.Candidate', related_name='voters', through='voting.Vote')),
             ],
             options={
             },
@@ -38,11 +49,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='VotingEvent',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, auto_created=True, verbose_name='ID')),
-                ('title', models.CharField(max_length=256, verbose_name='Title')),
-                ('description', models.TextField(blank=True, verbose_name='Description')),
-                ('starting_date', models.DateTimeField(default=voting.models.default_starting_time, verbose_name='Starting Time')),
-                ('expiration_date', models.DateTimeField(default=voting.models.default_expire_time, verbose_name='Expiration Time')),
+                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('title', models.CharField(verbose_name='Title', max_length=256)),
+                ('description', models.TextField(verbose_name='Description', blank=True)),
+                ('starting_date', models.DateTimeField(verbose_name='Starting Time', default=voting.models.default_starting_time)),
+                ('expiration_date', models.DateTimeField(verbose_name='Expiration Time', default=voting.models.default_expire_time)),
             ],
             options={
             },
@@ -52,6 +63,12 @@ class Migration(migrations.Migration):
             model_name='voter',
             name='event',
             field=models.ForeignKey(to='voting.VotingEvent', related_name='voters'),
+            preserve_default=True,
+        ),
+        migrations.AddField(
+            model_name='vote',
+            name='voter',
+            field=models.ForeignKey(to='voting.Voter', related_name='votes'),
             preserve_default=True,
         ),
         migrations.AddField(
