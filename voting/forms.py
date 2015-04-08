@@ -75,3 +75,4 @@ class CheckInfoForm(forms.ModelForm):
     class Meta:
         model = Voter
         fields = ['username', 'passphrase']
+        widgets = {'passphrase': forms.PasswordInput()}
