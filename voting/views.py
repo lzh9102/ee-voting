@@ -221,13 +221,14 @@ class VoteView(View):
         voter = self.get_voter()
         return self.display_form(request)
 
-    def display_form(self, request, error=None):
+    def display_form(self, request, error=None, default_choices=None):
         voter = self.get_voter()
         context = {
             'candidates': voter.event.candidates.all(),
             'event': voter.event,
             'voter': voter,
             'error': error,
+            'choices': default_choices,
         }
         return render(request, self.template_name, context)
 
@@ -273,6 +274,9 @@ class VoteView(View):
 
             self.clear_session()
             return render(request, 'voting/end_message.html')
+        elif 'modify' in request.POST:
+            return self.display_form(request, error=None,
+                                     default_choices=choices)
         else: # not confirmed
             return render(request, 'voting/vote_confirm.html', {
                 'choices': choices,

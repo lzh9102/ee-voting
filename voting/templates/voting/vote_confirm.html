@@ -34,10 +34,9 @@
       {% endfor %}
     </tbody>
   </table>
-  <input type="hidden" name="confirm">
 
-  <a class="btn btn-default" href="{% url 'vote' %}">{% trans "Cancel" %}</a>
-  <button class="btn btn-primary" type="submit">{% trans "Confirm" %}</button>
+  <button class="btn btn-default" name="modify" type="submit">{% trans "Modify" %}</button>
+  <button class="btn btn-primary" name="confirm" type="submit">{% trans "Confirm" %}</button>
 </form>
 
 {% endblock %}

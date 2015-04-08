@@ -31,7 +31,7 @@
         <div class="radio">
           <label>
             {{ candidate.full_name }}
-            <select class="form-control" name="candidate_{{ candidate.pk }}">
+            <select class="form-control" id="candidate_{{ candidate.pk }}" name="candidate_{{ candidate.pk }}">
               <option class="form-control" value="N">{% trans "Not Selected" %}</option>
               <option class="form-control" value="A">{% trans "Agree" %}</option>
               <option class="form-control" value="D">{% trans "Disagree" %}</option>
@@ -46,3 +46,15 @@
 </div>
 
 {% endblock %}
+
+{% block scripts %}
+<script>
+  {% if choices %}
+  // Use jquery to set the initial choices
+  {% for candidate, choice in choices.items %}
+  $('#candidate_{{ candidate.pk }}').val('{{ choice }}');
+  {% endfor %}
+  {% endif %}
+</script>
+{% endblock %}
+
