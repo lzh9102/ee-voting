@@ -5,4 +5,7 @@
 <p>
   {% blocktrans %}Your vote has been saved. Thanks for using this site{% endblocktrans %}
 </p>
+<p>
+  <a class="btn btn-primary" href="{% url 'welcome_page' %}">{% trans "Back to homepage" %}</a>
+</p>
 {% endblock content %}
