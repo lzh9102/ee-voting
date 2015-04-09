@@ -31,7 +31,7 @@
         <div class="radio">
           <label>
             {{ candidate.full_name }}
-            <select class="form-control" id="candidate_{{ candidate.pk }}" name="candidate_{{ candidate.pk }}">
+            <select class="form-control candidate-select" id="candidate_{{ candidate.pk }}" name="candidate_{{ candidate.pk }}">
               <option class="form-control" value="N">{% trans "Not Selected" %}</option>
               <option class="form-control" value="A">{% trans "Agree" %}</option>
               <option class="form-control" value="D">{% trans "Disagree" %}</option>
@@ -40,7 +40,8 @@
         </div>
       {% endfor %}
       <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
-      <button name="cancel" class="btn btn-default" type="submit">{% trans "Cancel" %}</button>
+      <a href="#" id="reset" class="btn btn-default">{% trans "Reset Choices" %}</a>
+      <button name="cancel" class="btn btn-default" type="submit">{% trans "Logout" %}</button>
     </form>
   </div>
 </div>
@@ -55,6 +56,9 @@
   $('#candidate_{{ candidate.pk }}').val('{{ choice }}');
   {% endfor %}
   {% endif %}
+  $('#reset').click(function() {
+    $('.candidate-select').val('N');
+  });
 </script>
 {% endblock %}
 
