@@ -376,12 +376,14 @@ class VotingTests(TestCase):
         response = client.post(reverse('vote'), formdata)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/vote_confirm.html')
+        self.assertFalse(self.voter1.voted)
 
         # confirm to save the result
         formdata['confirm'] = True
         response = client.post(reverse('vote'), formdata)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'voting/end_message.html')
+        self.assertTrue(self.voter1.voted)
 
         # FIXME: content of the html templates are not tested
 
@@ -400,7 +402,20 @@ class VotingTests(TestCase):
         response = client.get(reverse('vote'))
         self.assertRedirects(response, reverse('welcome_page'))
 
-        # vote again
+        # disallow voting again if vote.allow_revote is False
+        self.event1.allow_revote = False
+        self.event1.save()
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase,
+        }, follow=True)
+        self.assertEqual(response.status_code, 200) # reject with error message
+        self.assertIn('form', response.context)
+        self.assertIn('error', response.context)
+
+        # allow voting again by setting vote.allow_revote to True
+        self.event1.allow_revote = True
+        self.event1.save()
         response = client.post(reverse('welcome_page'), {
             'username': self.voter1.username,
             'passphrase': self.voter1.passphrase,

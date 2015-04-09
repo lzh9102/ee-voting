@@ -18,7 +18,8 @@ class LoginRequiredMixin:
         view = super(LoginRequiredMixin, cls).as_view(**initkwargs)
         return login_required(view)
 
-VOTING_EVENT_FIELDS = ['title', 'description', 'starting_date', 'expiration_date']
+VOTING_EVENT_FIELDS = ['title', 'description', 'starting_date', 'expiration_date',
+                       'allow_revote']
 
 class VotingEventList(LoginRequiredMixin, ListView):
     model = VotingEvent
@@ -183,6 +184,8 @@ class WelcomePage(FormView):
 
             if voter.event.is_expired:
                 error = _("Sorry, the voting event has expired.")
+            elif (not voter.event.allow_revote) and voter.voted:
+                error = _("You already voted and can't vote again!")
             else:
                 self.request.session['voter_id'] = voter.pk
                 return HttpResponseRedirect(reverse('vote'))

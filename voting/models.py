@@ -29,6 +29,8 @@ class VotingEvent(models.Model):
                                          verbose_name=_("Starting Time"))
     expiration_date = models.DateTimeField(default=default_expire_time,
                                            verbose_name=_("Expiration Time"))
+    allow_revote = models.BooleanField(default=False,
+                                       verbose_name=("Allow users to vote again (overwriting previous results)"))
 
     @property
     def url_edit(self):
