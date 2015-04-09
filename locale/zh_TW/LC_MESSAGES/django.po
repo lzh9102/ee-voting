@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-09 09:38+0800\n"
-"PO-Revision-Date: 2015-04-09 09:39+0800\n"
+"POT-Creation-Date: 2015-04-09 16:52+0800\n"
+"PO-Revision-Date: 2015-04-09 16:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -57,18 +57,18 @@ msgstr "開始時間"
 msgid "Expiration Time"
 msgstr "結束時間"
 
-#: voting/models.py:51 voting/models.py:78
+#: voting/models.py:53 voting/models.py:80
 #: voting/templates/voting/voting_event_edit.html:39
 msgid "Full Name"
 msgstr "全名"
 
-#: voting/models.py:79 voting/templates/voting/add_voter_wizard.html:40
+#: voting/models.py:81 voting/templates/voting/add_voter_wizard.html:40
 #: voting/templates/voting/voter_list.html:32
 #: voting/templates/voting/voters_print.html:22
 msgid "Username"
 msgstr "使用者名稱"
 
-#: voting/models.py:81 voting/templates/voting/voter_list.html:33
+#: voting/models.py:83 voting/templates/voting/voter_list.html:33
 #: voting/templates/voting/voters_print.html:23
 msgid "Passphrase"
 msgstr "確認碼"
@@ -121,7 +121,6 @@ msgstr "ID"
 
 #: voting/templates/voting/add_voter_wizard.html:90
 #: voting/templates/voting/candidate_delete.html:20
-#: voting/templates/voting/vote.html:43
 #: voting/templates/voting/voter_delete.html:20
 #: voting/templates/voting/voting_event_delete.html:20
 msgid "Cancel"
@@ -200,6 +199,7 @@ msgid "Toggle navigation"
 msgstr "切換瀏覽列"
 
 #: voting/templates/voting/layout-admin.html:54
+#: voting/templates/voting/vote.html:44
 msgid "Logout"
 msgstr "登出"
 
@@ -225,6 +225,10 @@ msgstr "%(name)s 您好！請選擇一個候選人"
 #: voting/templates/voting/vote_confirm.html:30
 msgid "Not Selected"
 msgstr "未選擇"
+
+#: voting/templates/voting/vote.html:43
+msgid "Reset Choices"
+msgstr "清除選擇"
 
 #: voting/templates/voting/vote_confirm.html:9
 msgid "Confirm Voting"
@@ -359,19 +363,23 @@ msgstr "請輸入您的使用者名稱及密碼："
 msgid "Continue"
 msgstr "繼續"
 
-#: voting/views.py:185
+#: voting/views.py:186
 msgid "Sorry, the voting event has expired."
 msgstr "抱歉，投票活動已結束。"
 
-#: voting/views.py:190
+#: voting/views.py:188
+msgid "You already voted and can't vote again!"
+msgstr "您已經投過票了，無法重複投票！"
+
+#: voting/views.py:193
 msgid "The username or passphrase you input is invalid"
 msgstr "使用者名稱和確認碼不正確"
 
-#: voting/views.py:256
+#: voting/views.py:259
 msgid "Please choose one candidate"
 msgstr "請選擇一位候選人"
 
-#: voting/views.py:262
+#: voting/views.py:265
 msgid "The candidate you chose doesn't belong to this vote!"
 msgstr "您選擇的候選人不屬於此投票活動！"
 
