@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-09 16:52+0800\n"
-"PO-Revision-Date: 2015-04-09 16:53+0800\n"
+"POT-Creation-Date: 2015-04-10 16:31+0800\n"
+"PO-Revision-Date: 2015-04-10 16:33+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 1.7.4\n"
+"X-Generator: Poedit 1.7.5\n"
 
 #: voting/forms.py:29
 #, python-format
@@ -121,7 +121,6 @@ msgstr "ID"
 
 #: voting/templates/voting/add_voter_wizard.html:90
 #: voting/templates/voting/candidate_delete.html:20
-#: voting/templates/voting/voter_delete.html:20
 #: voting/templates/voting/voting_event_delete.html:20
 msgid "Cancel"
 msgstr "取消"
@@ -246,10 +245,6 @@ msgstr "修改"
 msgid "Confirm"
 msgstr "確認"
 
-#: voting/templates/voting/voter_delete.html:19
-msgid "Delete Voters"
-msgstr "刪除投票者"
-
 #: voting/templates/voting/voter_list.html:21
 msgid "Print Credentials"
 msgstr "列印登入資訊"
@@ -355,11 +350,21 @@ msgstr "尚未投票"
 msgid "Welcome to NCTU EE Voting"
 msgstr "歡迎來到交大電子投票系統"
 
-#: voting/templates/voting/welcome_page.html:19
+#: voting/templates/voting/welcome_page.html:15
+msgid ""
+"This site is incompatible with the browser you are using.\n"
+"        Please use Internet Explorer 9+ or upgrade to a standard-comformant\n"
+"        browser like Firefox or Chrome/Chromium.\n"
+"        "
+msgstr ""
+"此網站與您正在使用的瀏覽器不相容。請使用 Internet Explorer 9 以上的版本或是升"
+"級到符合標準的瀏覽器如 Firefox、Chrome/Chromium。"
+
+#: voting/templates/voting/welcome_page.html:29
 msgid "Please input your username and passphrase:"
 msgstr "請輸入您的使用者名稱及密碼："
 
-#: voting/templates/voting/welcome_page.html:31
+#: voting/templates/voting/welcome_page.html:41
 msgid "Continue"
 msgstr "繼續"
 
@@ -382,6 +387,9 @@ msgstr "請選擇一位候選人"
 #: voting/views.py:265
 msgid "The candidate you chose doesn't belong to this vote!"
 msgstr "您選擇的候選人不屬於此投票活動！"
+
+#~ msgid "Delete Voters"
+#~ msgstr "刪除投票者"
 
 #~ msgid "Can only choose one candidate"
 #~ msgstr "只能選擇一位候選人"
