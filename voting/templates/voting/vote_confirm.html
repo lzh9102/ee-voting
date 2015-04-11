@@ -14,7 +14,7 @@
       <th>{% trans "Choice" %}</th>
     </thead>
     <tbody>
-      {% for candidate, choice in choices.items %}
+      {% for candidate, choice in choices_tuple %}
       <tr>
         <td>
           <input type="hidden" name="candidate_{{ candidate.pk }}" value="{{ choice }}">

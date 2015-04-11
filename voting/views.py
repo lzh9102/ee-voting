@@ -227,13 +227,22 @@ class VoteView(View):
     def display_form(self, request, error=None, default_choices=None):
         voter = self.get_voter()
         context = {
-            'candidates': voter.event.candidates.all(),
+            'candidates': voter.event.candidates.all().order_by('pk'),
             'event': voter.event,
             'voter': voter,
             'error': error,
             'choices': default_choices,
         }
         return render(request, self.template_name, context)
+
+    def display_confirm_page(self, request, choices):
+        return render(request, 'voting/vote_confirm.html', {
+            # Convert the choices dict to a tuple list (candidate, choice).
+            # The tuple list is sorted by the candidate id
+            # FIXME: this is not covered by the unit test
+            'choices_tuple': sorted(list(choices.items()),
+                                    key=lambda x: x[0].pk),
+        })
 
     def clear_session(self):
         self.request.session.pop('voter_id', None)
@@ -281,8 +290,5 @@ class VoteView(View):
             return self.display_form(request, error=None,
                                      default_choices=choices)
         else: # not confirmed
-            return render(request, 'voting/vote_confirm.html', {
-                'choices': choices,
-            })
-
+            return self.display_confirm_page(request, choices)
 
