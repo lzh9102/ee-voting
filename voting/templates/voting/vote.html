@@ -25,12 +25,13 @@
     <form method="post">
       {% csrf_token %}
         <p>
-          {% blocktrans with name=voter.full_name %}Hello, {{name}}! Please vote for a candidate{% endblocktrans %}
+          {% blocktrans with name=voter.full_name %}Hello, {{name}}! Please select agree/disagree.{% endblocktrans %}
         </p>
+        <hr>
         {% for candidate in candidates %}
         <div class="radio">
           <label>
-            {{ candidate.full_name }}
+            <b>{{ candidate.full_name }}</b>
             <select class="form-control candidate-select" id="candidate_{{ candidate.pk }}" name="candidate_{{ candidate.pk }}">
               <option class="form-control" value="N">{% trans "Not Selected" %}</option>
               <option class="form-control" value="A">{% trans "Agree" %}</option>
@@ -38,6 +39,7 @@
             </select>
           </label>
         </div>
+        <hr>
       {% endfor %}
       <button class="btn btn-primary" type="submit">{% trans "Submit" %}</button>
       <a href="#" id="reset" class="btn btn-default">{% trans "Reset Choices" %}</a>
