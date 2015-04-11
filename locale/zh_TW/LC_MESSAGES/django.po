@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-10 16:31+0800\n"
-"PO-Revision-Date: 2015-04-10 16:33+0800\n"
+"POT-Creation-Date: 2015-04-11 17:35+0800\n"
+"PO-Revision-Date: 2015-04-11 17:35+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -31,12 +31,12 @@ msgstr "輸入"
 msgid "You must input at least 1 voter"
 msgstr "您必須輸入至少一位選舉人"
 
-#: voting/models.py:21 voting/templates/voting/vote.html:36
+#: voting/models.py:21 voting/templates/voting/vote.html:37
 #: voting/templates/voting/vote_confirm.html:26
 msgid "Agree"
 msgstr "同意"
 
-#: voting/models.py:22 voting/templates/voting/vote.html:37
+#: voting/models.py:22 voting/templates/voting/vote.html:38
 #: voting/templates/voting/vote_confirm.html:28
 msgid "Disagree"
 msgstr "不同意"
@@ -134,7 +134,7 @@ msgid "Next"
 msgstr "下一步"
 
 #: voting/templates/voting/add_voter_wizard.html:102
-#: voting/templates/voting/vote.html:42
+#: voting/templates/voting/vote.html:44
 msgid "Submit"
 msgstr "提交"
 
@@ -198,7 +198,7 @@ msgid "Toggle navigation"
 msgstr "切換瀏覽列"
 
 #: voting/templates/voting/layout-admin.html:54
-#: voting/templates/voting/vote.html:44
+#: voting/templates/voting/vote.html:46
 msgid "Logout"
 msgstr "登出"
 
@@ -217,15 +217,15 @@ msgstr "管理界面"
 
 #: voting/templates/voting/vote.html:28
 #, python-format
-msgid "Hello, %(name)s! Please vote for a candidate"
-msgstr "%(name)s 您好！請選擇一個候選人"
+msgid "Hello, %(name)s! Please select agree/disagree."
+msgstr "%(name)s 您好！請行使同意權。"
 
-#: voting/templates/voting/vote.html:35
+#: voting/templates/voting/vote.html:36
 #: voting/templates/voting/vote_confirm.html:30
 msgid "Not Selected"
 msgstr "未選擇"
 
-#: voting/templates/voting/vote.html:43
+#: voting/templates/voting/vote.html:45
 msgid "Reset Choices"
 msgstr "清除選擇"
 
@@ -380,11 +380,11 @@ msgstr "您已經投過票了，無法重複投票！"
 msgid "The username or passphrase you input is invalid"
 msgstr "使用者名稱和確認碼不正確"
 
-#: voting/views.py:259
+#: voting/views.py:268
 msgid "Please choose one candidate"
 msgstr "請選擇一位候選人"
 
-#: voting/views.py:265
+#: voting/views.py:274
 msgid "The candidate you chose doesn't belong to this vote!"
 msgstr "您選擇的候選人不屬於此投票活動！"
 
