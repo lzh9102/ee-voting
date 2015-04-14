@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-11 17:35+0800\n"
-"PO-Revision-Date: 2015-04-11 17:35+0800\n"
+"POT-Creation-Date: 2015-04-14 11:42+0800\n"
+"PO-Revision-Date: 2015-04-09 16:53+0800\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh_TW\n"
@@ -197,16 +197,20 @@ msgstr "投票者"
 msgid "Toggle navigation"
 msgstr "切換瀏覽列"
 
-#: voting/templates/voting/layout-admin.html:54
-#: voting/templates/voting/vote.html:46
+#: voting/templates/voting/layout-admin.html:43
+msgid "Voting Page"
+msgstr "投票頁面"
+
+#: voting/templates/voting/layout-admin.html:58
+#: voting/templates/voting/vote.html:44
 msgid "Logout"
 msgstr "登出"
 
-#: voting/templates/voting/layout-admin.html:69
+#: voting/templates/voting/layout-admin.html:73
 msgid "Voting Event List"
 msgstr "投票活動清單"
 
-#: voting/templates/voting/layout-admin.html:72
+#: voting/templates/voting/layout-admin.html:76
 #: voting/templates/voting/voting_event_create.html:9
 msgid "Create Voting Event"
 msgstr "新增投票活動"
