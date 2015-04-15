@@ -308,6 +308,20 @@ class VotingTests(TestCase):
         self.event2_candidate = Candidate.objects.create(event=self.event2,
                                                          full_name='candidate')
 
+    def testIncorrectVoterId(self):
+        client = Client()
+
+        response = client.post(reverse('welcome_page'), {
+            'username': self.voter1.username,
+            'passphrase': self.voter1.passphrase
+        })
+        self.assertRedirects(response, reverse('vote'))
+
+        # should redirect to welcome page if the voter doesn't exist
+        self.voter1.delete()
+        response = client.get(reverse('vote'))
+        self.assertRedirects(response, reverse('welcome_page'))
+
     def testWelcomePageReject(self):
         client = Client()
 

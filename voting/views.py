@@ -209,9 +209,13 @@ class VoteView(View):
         # redirect to welcome_page if no voter information in session
         if 'voter_id' not in request.session:
             return HttpResponseRedirect(reverse('welcome_page'))
+        try:
+            voter = Voter.objects.get(pk=request.session['voter_id'])
+        except Voter.DoesNotExist:
+            self.clear_session();
+            return HttpResponseRedirect(reverse('welcome_page'))
 
         # enforce expiration date
-        voter = Voter.objects.get(pk=request.session['voter_id'])
         if voter.event.is_expired:
             return HttpResponseRedirect(reverse('welcome_page'))
 
